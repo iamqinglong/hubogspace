@@ -45,7 +45,7 @@ import {useDispatch} from 'react-redux'
 import {setLogin} from 'store/actions/index'
 import jwt from 'jsonwebtoken'
 let token = cookie.get('token')
-const jwt_secret = 'gN9Mz2dGsOLcEBvNYYss1fJKYJ79OEQm6RlZN3uSXpzkakzOCksICubkQUBAzifZ'
+const jwt_secret = 'MrqEDf3rUgk4SodQod0qnK3zPgufo1LEi39liqW5F3tosc3ZeMQ2G0gnotDc1Pkx'
 
 if(token) {
   jwt.verify(token, jwt_secret, (err, decoded)=> {

@@ -1,5 +1,6 @@
-import React from "react";
+import React, {useState, useEffect} from "react";
 import ReactMap from 'components/ReactMap'
+import ImageUploader from 'react-images-upload';
 // reactstrap components
 import {
   Button,
@@ -21,18 +22,23 @@ import DefaultFooter from "components/Footers/DefaultFooter.js";
 import NavbarComponent from "components/Navbars/NavbarComponent";
 
 function ControlPanelPage() {
-  const [firstFocus, setFirstFocus] = React.useState(false);
-  const [lastFocus, setLastFocus] = React.useState(false);
-  const mapRef = React.createRef()
-  React.useEffect(() => {
+  const [firstFocus, setFirstFocus] = useState(false);
+  const [lastFocus, setLastFocus] = useState(false);
+  const [pictures, setPictures] = useState([])
+
+  useEffect(() => {
     document.body.classList.add("landing-page");
     document.body.classList.add("sidebar-collapse");
     document.documentElement.classList.remove("nav-open");
-    return function cleanup() {
+    return () => {
       document.body.classList.remove("landing-page");
       document.body.classList.remove("sidebar-collapse");
     };
-  });
+  },[])
+  const onDrop =(pictureFiles, pictureDataURLs)=> {
+    console.log(pictureDataURLs, pictureFiles)
+    setPictures({...pictures, pictureFiles})
+	}
   return (
     <>
       <NavbarComponent color={'info'}/>
@@ -68,6 +74,16 @@ function ControlPanelPage() {
                       <i className="now-ui-icons shopping shop"></i>
                     </InputGroupText>
                   </InputGroupAddon>
+                </InputGroup>
+                <InputGroup className={firstFocus ? "input-group-focus" : ""}>
+                      <ImageUploader
+                        withIcon={true}
+                        buttonText='Choose images'
+                        onChange={onDrop}
+                        imgExtension={['.jpg', '.gif', '.png', '.gif']}
+                        maxFileSize={5242880}
+                        withPreview={true}
+                  />
                 </InputGroup>
                 <div className="text-center ml-auto mr-auto">
                 <p className="text-center">Accept Mode of Payments</p>
@@ -110,19 +126,8 @@ function ControlPanelPage() {
                     type="textarea"
                   ></Input>
                 </div>
-                <InputGroup className={firstFocus ? "input-group-focus" : ""}>
-                  <Input
-                    placeholder="Set an address"
-                    type="text"
-                    onFocus={() => setFirstFocus(true)}
-                    onBlur={() => setFirstFocus(false)}
-                  ></Input>
-                  <InputGroupAddon addonType="append">
-                    <InputGroupText>
-                      <i className="now-ui-icons location_pin"></i>
-                    </InputGroupText>
-                  </InputGroupAddon>
-                </InputGroup>
+                <p className="text-center">Search or Drag red marker or Click on the Map</p>
+                <p className="text-center">PS: It automatically get the geolocation</p>
                 <div className="textarea-container">
                     <ReactMap/>
                 </div>
