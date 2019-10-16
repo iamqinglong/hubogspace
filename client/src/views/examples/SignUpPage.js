@@ -36,12 +36,15 @@ const SignUpPage =(props)=> {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [passwordConfirm, setPasswordConfirm] = useState('')
+  const [role, setRole] = useState('lessee')
   const [errors, setErrors] = useState({})
   const dispatch = useDispatch()
+
   const handleOnChange = (e,setFunction) => {
     const val = e.target.value
     setFunction(val)
   }
+  
   const submit = async (e) => {
     e.preventDefault()
     try {
@@ -50,7 +53,8 @@ const SignUpPage =(props)=> {
         last_name : lastName,
         email : email,
         password : password,
-        password_confirm : passwordConfirm
+        password_confirm : passwordConfirm,
+        role : role,
       }
       const res = await axios.post('http://localhost:8000/api/auth/register',data)
       cookie.set("token", res.data.access_token)
@@ -98,15 +102,11 @@ const SignUpPage =(props)=> {
                   <CardBody>
                     <InputGroup
                       className={
-                        "no-border input-lg" +
+                        "input-lg" +
                         (firstFocus ? " input-group-focus" : "")
                       }
                     >
-                      <InputGroupAddon addonType="prepend">
-                        <InputGroupText>
-                          <i className="now-ui-icons users_circle-08"></i>
-                        </InputGroupText>
-                      </InputGroupAddon>
+                      
                       <Input
                          
                         invalid={errors.first_name ? true:false}
@@ -116,6 +116,11 @@ const SignUpPage =(props)=> {
                         onBlur={() => setFirstFocus(false)}
                         onChange={(e) => {handleOnChange(e,setFirstName)}}
                       ></Input>
+                      <InputGroupAddon addonType="append">
+                        <InputGroupText>
+                          <i className="now-ui-icons users_circle-08"></i>
+                        </InputGroupText>
+                      </InputGroupAddon>
                       {
                         errors.first_name ? (<FormFeedback>{errors.first_name[0]}</FormFeedback>) : ''
                         
@@ -123,15 +128,11 @@ const SignUpPage =(props)=> {
                     </InputGroup>
                     <InputGroup
                       className={
-                        "no-border input-lg" +
+                        "input-lg" +
                         (lastFocus ? " input-group-focus" : "")
                       }
                     >
-                      <InputGroupAddon addonType="prepend">
-                        <InputGroupText>
-                          <i className="now-ui-icons text_caps-small"></i>
-                        </InputGroupText>
-                      </InputGroupAddon>
+                      
                       <Input
                         invalid={errors.last_name ? true:false}
                         placeholder="Last Name..."
@@ -140,6 +141,11 @@ const SignUpPage =(props)=> {
                         onBlur={() => setLastFocus(false)}
                         onChange={(e) => {handleOnChange(e,setLastName)}}
                       ></Input>
+                      <InputGroupAddon addonType="append">
+                        <InputGroupText>
+                          <i className="now-ui-icons text_caps-small"></i>
+                        </InputGroupText>
+                      </InputGroupAddon>
                        {
                         errors.last_name ? (<FormFeedback>{errors.last_name[0]}</FormFeedback>) : ''
                         
@@ -147,15 +153,11 @@ const SignUpPage =(props)=> {
                     </InputGroup>
                     <InputGroup
                       className={
-                        "no-border input-lg" +
+                        "input-lg" +
                         (emailFocus ? " input-group-focus" : "")
                       }
                     >
-                      <InputGroupAddon addonType="prepend">
-                        <InputGroupText>
-                          <i className="now-ui-icons text_caps-small"></i>
-                        </InputGroupText>
-                      </InputGroupAddon>
+                      
                       <Input
                         invalid={errors.email ? true:false}
                         placeholder="Email Address..."
@@ -164,6 +166,11 @@ const SignUpPage =(props)=> {
                         onBlur={() => setEmailFocus(false)}
                         onChange={(e) => {handleOnChange(e,setEmail)}}
                       ></Input>
+                      <InputGroupAddon addonType="append">
+                        <InputGroupText>
+                          <i className="now-ui-icons text_caps-small"></i>
+                        </InputGroupText>
+                      </InputGroupAddon>
                       {
                         errors.email ? (<FormFeedback>{errors.email[0]}</FormFeedback>) : ''
                         
@@ -171,15 +178,11 @@ const SignUpPage =(props)=> {
                     </InputGroup>
                     <InputGroup
                       className={
-                        "no-border input-lg" +
+                        "input-lg" +
                         (passwordFocus ? " input-group-focus" : "")
                       }
                     >
-                      <InputGroupAddon addonType="prepend">
-                        <InputGroupText>
-                          <i className="now-ui-icons text_caps-small"></i>
-                        </InputGroupText>
-                      </InputGroupAddon>
+                      
                       <Input
                         invalid={errors.password ? true:false}
                         placeholder="Pasword..."
@@ -188,6 +191,11 @@ const SignUpPage =(props)=> {
                         onBlur={() => setPasswordFocus(false)}
                         onChange={(e) => {handleOnChange(e,setPassword)}}
                       ></Input>
+                      <InputGroupAddon addonType="append">
+                        <InputGroupText>
+                          <i className="now-ui-icons text_caps-small"></i>
+                        </InputGroupText>
+                      </InputGroupAddon>
                       {
                         errors.password ? (<FormFeedback>{errors.password[0]}</FormFeedback>) : ''
                         
@@ -195,15 +203,11 @@ const SignUpPage =(props)=> {
                     </InputGroup>
                     <InputGroup
                       className={
-                        "no-border input-lg" +
+                        "input-lg" +
                         (passwordConfirmFocus ? " input-group-focus" : "")
                       }
                     >
-                      <InputGroupAddon addonType="prepend">
-                        <InputGroupText>
-                          <i className="now-ui-icons text_caps-small"></i>
-                        </InputGroupText>
-                      </InputGroupAddon>
+                      
                       <Input
                         invalid={errors.password_confirm ? true:false}
                         placeholder="Confirm Password..."
@@ -212,11 +216,20 @@ const SignUpPage =(props)=> {
                         onBlur={() => setPasswordConfirmFocus(false)}
                         onChange={(e) => {handleOnChange(e,setPasswordConfirm)}}
                       ></Input>
+                      <InputGroupAddon addonType="append">
+                        <InputGroupText>
+                          <i className="now-ui-icons text_caps-small"></i>
+                        </InputGroupText>
+                      </InputGroupAddon>
                       {
                         errors.password_confirm ? (<FormFeedback>{errors.password_confirm[0]}</FormFeedback>) : ''
                         
                       }
                     </InputGroup>
+                    <Input className="dropdown" type="select" value={role} onChange={(e)=> {handleOnChange(e,setRole)}}>
+                      <option value="lessee">Lessee</option>
+                      <option value="lessor">Lessor</option>
+                    </Input>
                   </CardBody>
                   <CardFooter className="text-center">
                     <Button

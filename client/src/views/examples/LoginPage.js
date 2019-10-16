@@ -89,16 +89,11 @@ const LoginPage = (props) =>{
                   </CardHeader>
                   <CardBody>
                     <InputGroup
-                      className={
-                        "no-border input-lg" +
+                      className={"input-lg"+
                         (firstFocus ? " input-group-focus" : "")
                       }
                     >
-                      <InputGroupAddon addonType="prepend">
-                        <InputGroupText>
-                          <i className="now-ui-icons users_circle-08"></i>
-                        </InputGroupText>
-                      </InputGroupAddon>
+                      
                       <Input
                         invalid={errors.email ? true:false}
                         placeholder="Email Address..."
@@ -107,6 +102,11 @@ const LoginPage = (props) =>{
                         onBlur={() => setFirstFocus(false)}
                         onChange={(e)=>{handleOnChange(e,setEmail)}}
                       ></Input>
+                      <InputGroupAddon addonType="append">
+                        <InputGroupText>
+                          <i className="now-ui-icons users_circle-08"></i>
+                        </InputGroupText>
+                      </InputGroupAddon>
                       {
                         errors.email ? (<FormFeedback>{errors.email[0]}</FormFeedback>) : ''
                         
@@ -114,15 +114,11 @@ const LoginPage = (props) =>{
                     </InputGroup>
                     <InputGroup
                       className={
-                        "no-border input-lg" +
+                        "input-lg" +
                         (lastFocus ? " input-group-focus" : "")
                       }
                     >
-                      <InputGroupAddon addonType="prepend">
-                        <InputGroupText>
-                          <i className="now-ui-icons text_caps-small"></i>
-                        </InputGroupText>
-                      </InputGroupAddon>
+                      
                       <Input
                         invalid={errors.password ? true:false}
                         placeholder="Password..."
@@ -131,6 +127,11 @@ const LoginPage = (props) =>{
                         onBlur={() => setLastFocus(false)}
                         onChange={(e)=>{handleOnChange(e,setPassword)}}
                       ></Input>
+                      <InputGroupAddon addonType="append">
+                        <InputGroupText>
+                          <i className="now-ui-icons text_caps-small"></i>
+                        </InputGroupText>
+                      </InputGroupAddon>
                        {
                         errors.password ? (<FormFeedback>{errors.password[0]}</FormFeedback>) : ''
                         

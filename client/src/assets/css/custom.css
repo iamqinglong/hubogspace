@@ -245,3 +245,9 @@ a:hover {
     margin-left: 223px;
   } 
 } */
+.dropdown {
+  margin-left: 13px;
+}
+.dropdown option {
+  background-color: #4a5a61;
+}

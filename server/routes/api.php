@@ -31,3 +31,8 @@ Route::group([
     Route::post('register', 'AuthController@register');
 
 });
+
+Route::group(['middleware' => 'api'], function() {
+
+    Route::resource('spaces', 'SpaceController');
+});

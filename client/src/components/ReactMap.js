@@ -5,11 +5,11 @@ import MapGL,{Marker} from "react-map-gl";
 import DeckGL, { GeoJsonLayer } from "deck.gl";
 import Geocoder from "react-map-gl-geocoder";
 import Pin from './Pin'
-
+import axios from 'axios'
 const MAPBOX_TOKEN =
   "pk.eyJ1IjoiaWFtcWluZ2xvbmciLCJhIjoiY2sxZ2I0Njc0MDA3bDNicjJlcGNxc2s5aCJ9.LvOJH3TarvmPUsu-gnJg0g";
 
-const ReactMap =()=> {
+const ReactMap =(props)=> {
   const [viewport, setViewport] = useState({
     latitude: 8.482374,
     longitude: 124.642375,
@@ -32,13 +32,28 @@ const ReactMap =()=> {
       longitude: evt.lngLat[0],
       latitude: evt.lngLat[1]
     })
+    getLocation(marker.longitude,marker.latitude)
   }
-  const onMarkerDragEnd =(evt)=> {
+  const onMarkerDragEnd = async (evt)=> {
     
     setMarker({
       longitude: evt.lngLat[0],
       latitude: evt.lngLat[1]
     })
+    
+    getLocation(marker.longitude,marker.latitude)
+
+  }
+
+  const getLocation = async (long,lat)=> {
+    try {
+
+      const res = await axios.get(`https://api.mapbox.com/geocoding/v5/mapbox.places/${long}%2C${lat}.json?access_token=${MAPBOX_TOKEN}`)
+      props.setAddress(res.data.features[1].place_name)
+      props.setGeolocation({longitude : res.data.query[0], latitude: res.data.query[1]})
+    } catch (error) {
+      console.log(error)
+    }
   }
   const getCursor = (isHovering, isDragging) => {
     return isHovering ? 'pointer' : 'default';

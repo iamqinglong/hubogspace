@@ -45,7 +45,8 @@ class AuthController extends Controller
             'last_name'    => 'required',
             'email'   => 'required|email',
             'password'=> 'required',
-            'password_confirm' => 'required|same:password'
+            'password_confirm' => 'required|same:password',
+            'role' => 'required'
         ]);
         // return request('first_name');
         User::create([
@@ -53,6 +54,7 @@ class AuthController extends Controller
             'last_name' => request('last_name'),
             'email'    => request('email'),
             'password' => Hash::make(request('password')),
+            'role' => request('role'),
         ]);
 
         return $this->login(request());

@@ -132,10 +132,14 @@ function NavbarComponent(props) {
                     <p>{user.last_name}</p>
                   </DropdownToggle>
                   <DropdownMenu>
-                    <DropdownItem to="/control-panel-page" tag={Link}>
-                      <i className="now-ui-icons ui-1_settings-gear-63"></i>
-                      Control Panel
-                    </DropdownItem>
+                    {
+                      (user.role === 'lessor') ? (
+                          <DropdownItem to="/control-panel-page" tag={Link}>
+                            <i className="now-ui-icons ui-1_settings-gear-63"></i>
+                            Control Panel
+                          </DropdownItem>) : ('')
+                    }
+                    
                     <DropdownItem
                       target="_blank"
                     >
