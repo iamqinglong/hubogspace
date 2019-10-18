@@ -22,6 +22,7 @@ class CreateSpacesTable extends Migration
             $table->string('address');
             $table->float('longitude');
             $table->float('latitude');
+            $table->unsignedBigInteger('user_id');
             $table->timestamps();
         });
     }

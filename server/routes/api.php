@@ -35,4 +35,11 @@ Route::group([
 Route::group(['middleware' => 'api'], function() {
 
     Route::resource('spaces', 'SpaceController');
+    Route::get('getSpace', 'SpaceController@getSpace');
+    Route::get('getAllSpaces', 'SpaceController@getAllSpaces');
+});
+
+Route::group(['middleware' => 'api'], function() {
+
+    Route::post('payWithStripe', 'PaymentController@payWithStripe');
 });

@@ -7,6 +7,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Role;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+use App\Space;
+use App\Booking;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -65,4 +67,17 @@ class User extends Authenticatable implements JWTSubject
     {
         return [];
     }
+
+    public function space()
+    {
+        return $this->hasOne(Space::class);
+    }
+
+    public function bookings() 
+    {
+        
+        return $this->hasMany(Booking::class);
+        
+    }
+    
 }

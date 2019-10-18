@@ -1,4 +1,4 @@
-import React from "react";
+import React,{useState} from "react";
 
 // reactstrap components
 import {
@@ -9,6 +9,7 @@ import {
   CarouselItem,
   CarouselIndicators
 } from "reactstrap";
+import axios from "axios";
 
 // core components
 
@@ -30,9 +31,10 @@ const items = [
   }
 ];
 
-function CarouselSection() {
+function CarouselSection(props) {
   const [activeIndex, setActiveIndex] = React.useState(0);
   const [animating, setAnimating] = React.useState(false);
+  const [images, setImages] = useState(props.images)
   const onExiting = () => {
     setAnimating(true);
   };
@@ -53,13 +55,10 @@ function CarouselSection() {
     if (animating) return;
     setActiveIndex(newIndex);
   };
+
   return (
     <>
-      {/* <div className="section" id="carousel"> */}
         <Container>
-          {/* <div className="title">
-            <h4>Carousel</h4>
-          </div> */}
           <Row className="justify-content-center">
             <Col lg="18" md="12">
               <Carousel
@@ -68,20 +67,20 @@ function CarouselSection() {
                 previous={previous}
               >
                 <CarouselIndicators
-                  items={items}
+                  items={images}
                   activeIndex={activeIndex}
                   onClickHandler={goToIndex}
                 />
-                {items.map(item => {
+                {images.map(image => {
                   return (
                     <CarouselItem
                       onExiting={onExiting}
                       onExited={onExited}
-                      key={item.src}
+                      key={image.id}
                     >
-                      <img src={item.src} alt={item.altText} />
+                      <img src={`http://localhost:8000/storage/${image.filename}`}  />
                       <div className="carousel-caption d-none d-md-block">
-                        <h5>{item.caption}</h5>
+
                       </div>
                     </CarouselItem>
                   );

@@ -34,7 +34,7 @@ import SignUpPage from "views/examples/SignUpPage";
 import LandingPage from "views/examples/LandingPage";
 import BookingPage from "views/examples/BookingPage";
 import MyBookingsPage from "views/examples/MyBookingsPage";
-import ControlPanelPage from "views/examples/ControlPanelPage";
+import SetupPage from "views/examples/SetupPage";
 import store from './store/index'
 import {Provider} from 'react-redux'
 import AuthRoute from 'components/AuthRoute'
@@ -44,8 +44,9 @@ import cookie from 'js-cookie'
 import {useDispatch} from 'react-redux'
 import {setLogin} from 'store/actions/index'
 import jwt from 'jsonwebtoken'
+import ControlPanelPage from "views/examples/ControlPanelPage";
 let token = cookie.get('token')
-const jwt_secret = '8uz5Q09gLuLdsJSA5dZU952OP5cOYOaCp0B3c4kQriOCuD9FsUnhiUpegxyKhSg5'
+const jwt_secret = 'N3uJKf77wT8V62DufhaPu666dDm624qZzUGHOV2TK4kgLcFSarPna7j0I2YVEEFG'
 
 if(token) {
   jwt.verify(token, jwt_secret, (err, decoded)=> {
@@ -75,9 +76,10 @@ const render = () => {
               path="/mybookings-page"
               render={props => <MyBookingsPage {...props} />}
             />
-            <Route
+            <AuthRoute
               path="/booking-page"
               render={props => <BookingPage {...props} />}
+              component={BookingPage}
             />
             <Route
               path="/nucleo-icons"
@@ -107,6 +109,11 @@ const render = () => {
               path="/profile-page"
               render={props => <ProfilePage {...props} />}
               component={ProfilePage}
+            />
+            <AuthRoute
+              path="/setup-page"
+              render={props => <SetupPage {...props} />}
+              component={SetupPage}
             />
             <AuthRoute
               path="/control-panel-page"

@@ -30,6 +30,7 @@ function NavbarComponent(props) {
   let color = props.color ? props.color : "navbar-transparent"
   const [navbarColor, setNavbarColor] = useState(color);
   const [collapseOpen, setCollapseOpen] = useState(false);
+
   useEffect(() => {
     const updateNavbarColor = () => {
       
@@ -57,6 +58,7 @@ function NavbarComponent(props) {
       window.removeEventListener("scroll", updateNavbarColor);
     };
   });
+
   const logout = async (e)=> {
     e.preventDefault()
     try {
@@ -134,10 +136,16 @@ function NavbarComponent(props) {
                   <DropdownMenu>
                     {
                       (user.role === 'lessor') ? (
+                        (user.space_name) ? (
                           <DropdownItem to="/control-panel-page" tag={Link}>
                             <i className="now-ui-icons ui-1_settings-gear-63"></i>
                             Control Panel
-                          </DropdownItem>) : ('')
+                          </DropdownItem>
+                        ):
+                          (<DropdownItem to="/setup-page" tag={Link}>
+                            <i className="now-ui-icons ui-1_settings-gear-63"></i>
+                            Setup
+                          </DropdownItem>) ): ('')
                     }
                     
                     <DropdownItem

@@ -9,8 +9,6 @@ class Payment extends Model
 {
     public function spaces() 
     {
-        
-        return $this->belongsToMany(Space::class);
-        
+        return $this->belongsToMany(Space::class)->withTimestamps();
     }
 }

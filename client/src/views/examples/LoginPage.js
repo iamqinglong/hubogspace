@@ -46,12 +46,25 @@ const LoginPage = (props) =>{
       const res = await axios.post('http://localhost:8000/api/auth/login',data)
       cookie.set("token", res.data.access_token)
       dispatch(setLogin(res.data.user))
-      props.history.push('/index')
+      if(props.location.state.fromSidebarPanel)
+      {
+        props.history.push({
+          pathname: '/booking-page',
+          state: { 
+            space: props.location.state.space,
+          }
+        })
+      }
+      else
+        props.history.push('/index')
     } catch (error) {
       setErrors(error.response.data.errors)
     }
   }
-
+  useEffect(() => {
+    console.log(props.location.state)
+    
+  }, [])
   useEffect(() => {
     document.body.classList.add("login-page");
     document.body.classList.add("sidebar-collapse");

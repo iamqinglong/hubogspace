@@ -67,7 +67,30 @@ class AuthController extends Controller
      */
     public function me()
     {
-        return response()->json(auth()->user());
+        
+     
+        if(is_null(auth()->user()->space)){
+            $user = [
+                'id' => auth()->user()->id,
+                'first_name' => auth()->user()->first_name,
+                'last_name' => auth()->user()->last_name,
+                'role' => auth()->user()->role,
+                'updated_at' => auth()->user()->update_at,
+                'created_at' => auth()->user()->created_at,
+            ];
+        }
+        else {
+            $user = [
+                'id' => auth()->user()->id,
+                'first_name' => auth()->user()->first_name,
+                'last_name' => auth()->user()->last_name,
+                'role' => auth()->user()->role,
+                'updated_at' => auth()->user()->update_at,
+                'created_at' => auth()->user()->created_at,
+                'space_name' => auth()->user()->space->name,
+            ];
+        }
+        return response()->json($user);
     }
 
     /**
@@ -101,11 +124,35 @@ class AuthController extends Controller
      */
     protected function respondWithToken($token)
     {
+       
+        
+        if(is_null(auth()->user()->space)) {
+            $user = [
+                'id' => auth()->user()->id,
+                'first_name' => auth()->user()->first_name,
+                'last_name' => auth()->user()->last_name,
+                'role' => auth()->user()->role,
+                'updated_at' => auth()->user()->update_at,
+                'created_at' => auth()->user()->created_at,
+            ];
+        }
+        else {
+            $user = [
+                'id' => auth()->user()->id,
+                'first_name' => auth()->user()->first_name,
+                'last_name' => auth()->user()->last_name,
+                'role' => auth()->user()->role,
+                'updated_at' => auth()->user()->update_at,
+                'created_at' => auth()->user()->created_at,
+                'space_name' => auth()->user()->space->name,
+            ];
+        }
+        
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => auth()->factory()->getTTL() * 60,
-            'user' => auth()->user(),
+            'user' => $user,
         ]);
     }
 }

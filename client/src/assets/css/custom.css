@@ -11,8 +11,8 @@ code {
 }
 
 .marker-btn img {
-  width: 20px;
-  height: 20px;
+  width: 50px;
+  height: 50px;
 }
 
 .control-panel {
@@ -250,4 +250,28 @@ a:hover {
 }
 .dropdown option {
   background-color: #4a5a61;
+}
+
+.form-check .form-check-label {
+  display: inline-block;
+  position: relative;
+  cursor: pointer;
+  padding-left: 0px;
+  line-height: 26px;
+  margin-bottom: 0;
+  transition: color 0.3s linear;
+}
+.stripe {
+  overflow: hidden;
+  display: flex;
+  background: linear-gradient(rgb(40, 160, 229), rgb(1, 94, 148));
+  border: 0px;
+  padding: 1px;
+  text-decoration: none;
+  border-radius: 5px;
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 1px 0px;
+  cursor: pointer;
+  visibility: visible;
+  user-select: none;
+  margin-left: 5px;
 }
