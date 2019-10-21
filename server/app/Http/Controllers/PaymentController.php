@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Booking;
+use Carbon\Carbon;
 
 class PaymentController extends Controller
 {
@@ -13,13 +15,43 @@ class PaymentController extends Controller
     }
     public function payWithStripe(Request $request)
     {
-        return response()->json($request->all(), 200);
-        // Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
-        // Stripe\Charge::create ([
-        //         "amount" => $request->space->price * 100,
-        //         "currency" => "usd",
-        //         "source" => $request->stripeToken,
-        //         "description" => "Thank you for patronizing" 
-        // ]);
+        try {
+
+            \Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
+            $charge = \Stripe\Charge::create ([
+                    "amount" => $request->amount,
+                    "currency" => "PHP",
+                    "source" => $request->token['id'],  
+                    "description" => "Thank you for patronizing" 
+            ]);
+            $status = [
+                'key'=> 'paid',
+                'value' => 'Paid with Card',
+                'charge_id' => $charge->id,
+                'date' => time()
+            ];
+            // return response()->json($status);
+            $booking = Booking::create([
+                'check_in' =>    Carbon::parse($request->checkIn)->setTimezone('Asia/Singapore')->toDateTimeString(),
+                'check_out' =>  Carbon::parse($request->checkOut)->setTimezone('Asia/Singapore')->toDateTimeString(),
+                'space_id' =>    $request->space['id'],
+                'user_id' =>     auth()->user()->id,
+                'payment_id' =>  2,// 2 is the payment_id of card
+                'statuses' =>    $status,
+                ]);
+            
+            return response()->json([
+                'message' => 'Charge successful, Thank you for payment!',
+                'booking' => $booking,
+                'state' => 'success'
+            ]); 
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'There were some issue with the payment. Please try again later.',
+                'state' => 'error'
+            ]);
+        }
+       
+      
     }
 }

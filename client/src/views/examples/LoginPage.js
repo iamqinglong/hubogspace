@@ -46,7 +46,7 @@ const LoginPage = (props) =>{
       const res = await axios.post('http://localhost:8000/api/auth/login',data)
       cookie.set("token", res.data.access_token)
       dispatch(setLogin(res.data.user))
-      if(props.location.state.fromSidebarPanel)
+      if(props.location.state !== undefined)
       {
         props.history.push({
           pathname: '/booking-page',
@@ -56,7 +56,7 @@ const LoginPage = (props) =>{
         })
       }
       else
-        props.history.push('/index')
+        {props.history.push('/index')}
     } catch (error) {
       setErrors(error.response.data.errors)
     }

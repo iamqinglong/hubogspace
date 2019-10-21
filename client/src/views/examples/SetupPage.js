@@ -27,7 +27,7 @@ import Progress from 'components/Progress'
 import axios from "axios";
 import cookie from 'js-cookie'
 
-function SetupPage() {
+function SetupPage(props) {
   const user = useSelector(state=>state.auth.user)
   const [nameFocus, setNameFocus] = useState(false);
   const [priceFocus, setPriceFocus] = useState(false);
@@ -105,7 +105,9 @@ function SetupPage() {
       }
     
       })
-      console.log(res.data)
+      if(res.data.url !== undefined){
+        window.location.assign(res.data.url)
+      }
     } catch (error) {
       
     }
@@ -194,18 +196,11 @@ function SetupPage() {
                         <Label check>
                         <Input  type="checkbox" value="2" onChange={handleCheckBoxClick}></Input>
                         <span className="form-check-sign" ></span>
-                        Credit/Debit Card
+                        Card/Stripe
                         </Label>
                     </FormGroup>
                     </Col>
                     <Col >
-                    <FormGroup check>
-                        <Label check>
-                        <Input  type="checkbox" value="3" onChange={handleCheckBoxClick}></Input>
-                        <span className="form-check-sign" ></span>
-                        Paypal
-                        </Label>
-                    </FormGroup>
                     </Col>
                 </Row>
                 </div>

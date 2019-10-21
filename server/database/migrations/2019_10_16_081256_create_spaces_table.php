@@ -20,8 +20,8 @@ class CreateSpacesTable extends Migration
             $table->float('price');
             $table->string('contact');
             $table->string('address');
-            $table->float('longitude');
-            $table->float('latitude');
+            $table->string('longitude');
+            $table->string('latitude');
             $table->unsignedBigInteger('user_id');
             $table->timestamps();
         });

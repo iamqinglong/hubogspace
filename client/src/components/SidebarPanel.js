@@ -76,7 +76,12 @@ const SidebarPanel = (props) => {
                         outline
                         color="info"
                         size="lg"
-                        to="/booking-page"
+                        to={{
+                            pathname: '/booking-page',
+                            state: {
+                              space: props.space
+                            }
+                        }}
                         tag={Link}
                         
                     >

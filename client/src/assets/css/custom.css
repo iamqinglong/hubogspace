@@ -252,7 +252,7 @@ a:hover {
   background-color: #4a5a61;
 }
 
-.form-check .form-check-label {
+/* .form-check .form-check-label {
   display: inline-block;
   position: relative;
   cursor: pointer;
@@ -260,7 +260,7 @@ a:hover {
   line-height: 26px;
   margin-bottom: 0;
   transition: color 0.3s linear;
-}
+} */
 .stripe {
   overflow: hidden;
   display: flex;
