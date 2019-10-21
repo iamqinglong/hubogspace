@@ -127,6 +127,9 @@ const markerClick = async (e,space) => {
           longitude={selectedSpace.longitude}
           onClose={()=>{
           setSelectedSpace(null)
+          setData(null)
+          setDistance(null)
+          setDuration(null)
           }}
           >
           <div>

@@ -5,6 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Booking;
 use Carbon\Carbon;
+use Stripe\Charge;
+use Stripe\Stripe;
+use Stripe\Transfer;
+use App\Space;
 
 class PaymentController extends Controller
 {
@@ -16,14 +20,24 @@ class PaymentController extends Controller
     public function payWithStripe(Request $request)
     {
         try {
-
-            \Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
-            $charge = \Stripe\Charge::create ([
+            $space = Space::find($request->space['id']);
+            $owner = $space->user;
+            $payout = $request->amount * 0.50;
+            Stripe::setApiKey(env('STRIPE_SECRET'));
+            $charge = Charge::create ([
                     "amount" => $request->amount,
-                    "currency" => "PHP",
+                    "currency" => "usd",
                     "source" => $request->token['id'],  
                     "description" => "Thank you for patronizing" 
             ]);
+
+            Transfer::create([
+                'amount' => $payout,
+                "currency" => "usd",
+                "source_transaction" => $charge->id,
+                'destination' => $owner->stripe_connect_id
+            ]);
+
             $status = [
                 'key'=> 'paid',
                 'value' => 'Paid with Card',

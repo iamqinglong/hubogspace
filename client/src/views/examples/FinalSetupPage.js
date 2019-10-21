@@ -1,5 +1,6 @@
-import React from "react";
-
+import React, {useState,useEffect} from "react";
+import axios from 'axios'
+import cookie from 'js-cookie'
 // reactstrap components
 import {
   Button,
@@ -17,10 +18,20 @@ import LandingPageHeader from "components/Headers/LandingPageHeader.js";
 import DefaultFooter from "components/Footers/DefaultFooter.js";
 import NavbarComponent from "components/Navbars/NavbarComponent";
 
-function FinalSetupPage() {
-  const [firstFocus, setFirstFocus] = React.useState(false);
-  const [lastFocus, setLastFocus] = React.useState(false);
-  React.useEffect(() => {
+function FinalSetupPage(props) {
+  const [firstFocus, setFirstFocus] = useState(false);
+  const [lastFocus, setLastFocus] = useState(false);
+  const token = cookie.get('token')
+  const saveStripe = async (code) => {
+    try {
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      const res = await axios.post(`http://localhost:8000/api/stripe`,{code:code})
+      console.log(res.data)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  useEffect(() => {
     document.body.classList.add("landing-page");
     document.body.classList.add("sidebar-collapse");
     document.documentElement.classList.remove("nav-open");
@@ -29,18 +40,21 @@ function FinalSetupPage() {
       document.body.classList.remove("sidebar-collapse");
     };
   });
+  useEffect(() => {
+    const str = props.location.search.split('?code=')
+    const code = str[1]
+    saveStripe(code)
+  }, [])
   return (
     <>
-      <NavbarComponent />
+      <NavbarComponent color={'info'} />
       <div className="wrapper">
         
         <div className="section section-contact-us text-center">
           <Container>
             <h2 className="title">Successfully Space Setup</h2>
-            <p className="description">Your project is very important to us.</p>
           </Container>
         </div>
-        <DefaultFooter />
       </div>
     </>
   );

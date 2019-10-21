@@ -45,8 +45,9 @@ import {useDispatch} from 'react-redux'
 import {setLogin} from 'store/actions/index'
 import jwt from 'jsonwebtoken'
 import ControlPanelPage from "views/examples/ControlPanelPage";
+import FinalSetupPage from "views/examples/FinalSetupPage";
 let token = cookie.get('token')
-const jwt_secret = 'N3uJKf77wT8V62DufhaPu666dDm624qZzUGHOV2TK4kgLcFSarPna7j0I2YVEEFG'
+const jwt_secret = 'YVx32I3Dq7ITXwIHcKwyKu5GOUezWNVpcBg896YhiBROZikGdC7RtE8KFGKnoxat'
 
 if(token) {
   jwt.verify(token, jwt_secret, (err, decoded)=> {
@@ -55,7 +56,7 @@ if(token) {
       cookie.remove('token')
     }
     else{
-      if(decoded.iss !== 'http://localhost:8000/api/auth/login')
+      if((decoded.iss !== 'http://localhost:8000/api/auth/login')&&(decoded.iss !== 'http://localhost:8000/api/auth/register')&&(decoded.iss !== 'http://localhost:8000/api/auth/me'))
       {
         token = null
         cookie.remove('token')
@@ -73,13 +74,18 @@ const render = () => {
           <Switch>
             {/* <Route path="/index" render={props => <Index {...props} />} /> */}
             <Route
-              path="/mybookings-page"
+              path="/mybookings"
               render={props => <MyBookingsPage {...props} />}
             />
             <AuthRoute
               path="/booking-page"
               render={props => <BookingPage {...props} />}
               component={BookingPage}
+            />
+            <AuthRoute
+              path="/final-setup-page"
+              render={props => <FinalSetupPage {...props} />}
+              component={FinalSetupPage}
             />
             <Route
               path="/nucleo-icons"

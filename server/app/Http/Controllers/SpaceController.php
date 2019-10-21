@@ -6,6 +6,8 @@ use App\Space;
 use App\Image;
 use Illuminate\Http\Request;
 use App\Services\Stripe\Lessor;
+use Illuminate\Support\Facades\Auth;
+use App\User;
 
 class SpaceController extends Controller
 {
@@ -42,59 +44,55 @@ class SpaceController extends Controller
      */
     public function store(Request $request)
     {
-        //
-        // $request->validate([
-        //     'name'    => 'required',
-        //     'price'    => 'required',
-        //     'contact'   => 'required|numeric|digits:11',
-        //     'description'=> 'required|max:255',
-        //     'payments' => 'required|min:1',
-        //     'address' => 'required',
-        //     'pictures' => 'required',
-        //     'pictures.*.file' => 'file|image|max:5000|mimes:jpeg,png,jpg',
-        //     'longitude' => 'required',
-        //     'latitude' => 'required',
-        // ]);
         
-        // $space = Space::create([
-        //             'name' =>    $request->name,
-        //             'price' =>    $request->price,
-        //             'contact' =>    $request->contact,
-        //             'description' =>    $request->description,
-        //             'address' =>    $request->address,
-        //             'longitude' =>    $request->longitude,
-        //             'latitude' =>    $request->latitude,
-        //             'user_id' =>    $request->user_id,
-        //             ]);
-        // $space->payments()->sync(request('payments'));
-        // foreach ($request->pictures as $image) {
-        //     Image::create([
-        //         'space_id' => 1,
-        //         'filename' => $image->store('uploads','public')
-        //     ]);
-        // }
+        $request->validate([
+            'name'    => 'required',
+            'price'    => 'required',
+            'contact'   => 'required|numeric|digits:11',
+            'description'=> 'required|max:255',
+            'payments' => 'required|min:1',
+            'address' => 'required',
+            'pictures' => 'required',
+            'pictures.*.file' => 'file|image|max:5000|mimes:jpeg,png,jpg',
+            'longitude' => 'required',
+            'latitude' => 'required',
+        ]);
+        
+        $space = Space::create([
+                    'name' =>    $request->name,
+                    'price' =>    $request->price,
+                    'contact' =>    $request->contact,
+                    'description' =>    $request->description,
+                    'address' =>    $request->address,
+                    'longitude' =>    $request->longitude,
+                    'latitude' =>    $request->latitude,
+                    'user_id' =>    $request->user_id,
+                    ]);
+        $space->payments()->sync(request('payments'));
+        foreach ($request->pictures as $image) {
+            Image::create([
+                'space_id' => 1,
+                'filename' => $image->store('uploads','public')
+            ]);
+        }
         if(in_array('2', request('payments')))
         {
             $session = request()->session()->getId();
-            $url = config('services.stripe.connect') . $session;
+            $url = config('services.stripe.connect');
             return response()->json([
                 'url' => $url,
             ], 200);
         }
-        return response()->json($request->all(), 200);
+        return response()->json(['message'=> 'Successfuly created'], 200);
         
     }
     public function saveStripe(Request $request){
-            $this->validate($request, [
-                'code'=>'required',
-                'state'=>'required'
-            ]);
-            $session = DB::table('sessions')->where('id','=',$request->state)->first();
-            if(is_null($session))
-                return response()->json(['message' => 'State not found',], 404);
+       
             $data = Lessor::create($request->code);
-            auth()->user()->update(['stripe_connect_id' => $data->stripe_user_id]);
-            return response()->json($request->all(), 200);
+            $user = User::find(Auth::user()->id);
+            $user->stripe_connect_id = $data->stripe_user_id;
+            $user->save();
+            return response()->json(['message' => 'Connecting to Stipe sucessfully'], 200);
     }
     public function getSpace() {
        

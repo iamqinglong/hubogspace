@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\User;
 use App\Space;
 use App\Payment;
+use App\Booking;
 
 class Booking extends Model
 {
@@ -33,4 +34,8 @@ class Booking extends Model
         return $this->belongsTo(Payment::class);
     }
     
+    // public function bookings()
+    // {
+    //     return $this->hasMany(Booking::class);
+    // }
 }

@@ -42,4 +42,11 @@ Route::group(['middleware' => 'api'], function() {
 Route::group(['middleware' => 'api'], function() {
 
     Route::post('payWithStripe', 'PaymentController@payWithStripe');
+    Route::post('stripe', 'SpaceController@saveStripe');
 });
+
+Route::group(['middleware' => 'api'], function() {
+
+    Route::get('getMyBookings', 'BookingController@getMyBookings');
+});
+

@@ -149,7 +149,7 @@ function NavbarComponent(props) {
                     }
                     
                     <DropdownItem
-                      target="_blank"
+                      to="/mybookings" tag={Link}
                     >
                       <i className="now-ui-icons education_agenda-bookmark"></i>
                       My Bookings 

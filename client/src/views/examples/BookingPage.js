@@ -43,12 +43,8 @@ function BookingPage(props) {
     try {
       axios.defaults.headers.common['Authorization'] = `Bearer ${cookie.get('token')}`;
       const space = props.location.state.space
-      
-      // const check_in = checkIn.toString()
-      // console.log(check_in)
-      // console.log(moment(check_in).format('MM/DD/YYYY h:mm A'))
-      // const check_out = checkOut.toString()
       const res = await axios.post(`http://localhost:8000/api/payWithStripe`,{token,space,amount,checkIn,checkOut})
+      props.history.push('/mybookings')
       console.log(res.data)
     } catch (error) {
       console.log(error)
@@ -244,11 +240,11 @@ function BookingPage(props) {
                                 display: 'flex',
                                 marginLeft: '7px'
                             }}
-                            stripeKey={'pk_test_0C8J2ReyIjCJ5lizBDCj4H8H00kQIM48Iy'}
+                            stripeKey={'pk_test_XtHFdL6fP8UPdJCiWTN2ZmGc00gzVZ1ZxB'}
                             token={handleToken}
                             amount={amount}
                             product={props.location.state.space}
-                            currency={'PHP'}
+                            currency={'usd'}
                         />) : null
                     }
                     </div> 
