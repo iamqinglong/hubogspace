@@ -1,8 +1,4 @@
 import React,{useState,useEffect} from "react";
-import ReactMap from 'components/ReactMap'
-import ImageUploader from 'react-images-upload';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faMobileAlt, faDollarSign } from '@fortawesome/free-solid-svg-icons'
 import MapGL,{Marker} from "react-map-gl";
 import Pin from 'components/Pin'
 import cookie from 'js-cookie'
@@ -20,19 +16,15 @@ import {
   Container,
   Row,
   Col,
-  Button,
   Input,
-  InputGroupAddon,
-  InputGroupText,
   InputGroup,
   FormGroup,
   Label,
 } from "reactstrap";
 
 // core components
-import DefaultFooter from "components/Footers/DefaultFooter.js";
 import NavbarComponent from "components/Navbars/NavbarComponent";
-import ActiveBooking from "components/ActiveBooking";
+import ControlPanelBooking from "components/ControlPanelBooking";
 
 function ControlPanelPage() {
     const MAPBOX_TOKEN =
@@ -84,14 +76,10 @@ function ControlPanelPage() {
             setSpace({...res.data.space})
             setPayments([...res.data.payments])
             setPictures([...res.data.images])
-            console.log(pictures)
+            // console.log(space)
         } catch (error) {
             console.log(error)
         }
-    }
-    const onDrop =(pictureFiles, pictureDataURLs)=> {
-        console.log(pictureDataURLs, pictureFiles)
-        setPictures([...pictureFiles])
     }
     
     const handleOnChange = (e,setFunction) => {
@@ -103,14 +91,17 @@ function ControlPanelPage() {
         if(e.target.checked)
             setPayments([...payments,e.target.value])
     }
+
     useEffect(()=> {
-        console.log(pictures)
-    },[pictures])
+        if(space.length>0)
+            console.log(space)
+    },[space])
+
   return (
     <>
       <NavbarComponent color={'info'} />
       <div className="wrapper">
-        <div className="section section-tabs">
+        <div className="section">
             <Container>
             <Row>
                 <Col className="ml-auto mr-auto" md="12" xl="12">
@@ -212,16 +203,27 @@ function ControlPanelPage() {
                                 ></Input>
                                 </InputGroup>
                                 <div className="textarea-container">
-                                    <MapGL 
-                                    {...viewport} 
-                                    onViewportChange={(viewport) => setViewport(viewport)}
-                                    mapboxApiAccessToken={MAPBOX_TOKEN} 
-                                    mapStyle={'mapbox://styles/mapbox/streets-v11'}>
-                                        <Marker longitude={marker.longitude}
-                                                latitude={marker.latitude}>
-                                            <Pin size={30}/>
-                                        </Marker>
-                                    </MapGL>
+                                {
+                                    Object.keys(space).length > 0 ? ( 
+                                            <MapGL 
+                                            latitude={parseFloat(space.latitude)}
+                                            longitude={parseFloat(space.longitude)}
+                                            zoom={15}
+                                            width={'650px'}
+                                            height={'400px'}
+                                            // onViewportChange={(viewport) => setViewport(viewport)}
+                                            mapboxApiAccessToken={MAPBOX_TOKEN} 
+                                            mapStyle={'mapbox://styles/mapbox/streets-v11'}>
+                                                
+                                                        <Marker longitude={parseFloat(space.longitude)}
+                                                            latitude={parseFloat(space.latitude)}>
+                                                        <Pin size={30}/>
+                                                        </Marker>
+                                                    
+                                            
+                                            </MapGL>
+                                    ):('')
+                                }
                                 </div>
                                 <div className="text-center ml-auto mr-auto">
                                 <p className="text-center"><strong>Accept Mode of Payments</strong></p>
@@ -269,7 +271,7 @@ function ControlPanelPage() {
                         </Container>
                         </TabPane>
                         <TabPane tabId="iconPills2">
-                            <ActiveBooking/>
+                            <ControlPanelBooking/>
                         </TabPane>
                     </TabContent>
                     </CardBody>
@@ -278,7 +280,6 @@ function ControlPanelPage() {
             </Row>
             </Container>
         </div>
-        <DefaultFooter />
       </div>
     </>
   );

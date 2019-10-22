@@ -41,13 +41,11 @@ import AuthRoute from 'components/AuthRoute'
 import GuestRoute from 'components/GuestRoute'
 import axios from 'axios'
 import cookie from 'js-cookie'
-import {useDispatch} from 'react-redux'
-import {setLogin} from 'store/actions/index'
 import jwt from 'jsonwebtoken'
 import ControlPanelPage from "views/examples/ControlPanelPage";
 import FinalSetupPage from "views/examples/FinalSetupPage";
 let token = cookie.get('token')
-const jwt_secret = 'YVx32I3Dq7ITXwIHcKwyKu5GOUezWNVpcBg896YhiBROZikGdC7RtE8KFGKnoxat'
+const jwt_secret = 'fbAYQZ05XSysaHOqGVwntyyNs8kDsoTOlCJAhQ1MPNJgv8xszCo5ZB8rUVlX0ebr'
 
 if(token) {
   jwt.verify(token, jwt_secret, (err, decoded)=> {

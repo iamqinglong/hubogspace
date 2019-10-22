@@ -43,7 +43,7 @@ function MyBookingsPage() {
   useEffect(() => {
     getMyBookings()
   }, [])
-
+ 
   useEffect(() => {
     // document.body.classList.add("landing-page");
     document.body.classList.add("sidebar-collapse");
@@ -56,16 +56,14 @@ function MyBookingsPage() {
   const columns = useMemo(() => [
   
     {
-      name: 'Check-In',
-      selector: 'check_in',
+      name: 'Expected Arrival',
       sortable: true,
-      cell: (row) =>  moment(row.check_in).format('lll')
+      cell: (row) =>  moment(row.expected_arrival).format('lll')
     },
     {
-      name: 'Check-Out',
-      selector: 'check_out',
+      name: 'Booked',
       sortable: true,
-      cell: (row) =>  moment(row.check_out).format('lll')
+      cell: (row) =>  moment(row.created_at).format('lll')
     },
     {
       name: 'Space Name',
@@ -74,10 +72,23 @@ function MyBookingsPage() {
     {
       name: 'Latest Status',
       selector: 'statuses.value',
+      cell: (row) =>  {
+        row.statuses.sort((a, b) => (a.date > b.date) ? -1 : 1)
+        return row.statuses[row.statuses.length-1].value
+      }
     },
     {
       
-      cell: () => <Button  color={'neutral'} onClick={handleReview}>Write a Review</Button>,
+      cell: (row) => <Button color={'neutral'} onClick={handleReview}>View</Button>,
+      ignoreRowClick: true,
+      allowOverflow: true,
+      button: true,
+    },
+    {
+      
+      cell: (row) => {
+                  if(row.statuses.some(status => status.key === 'paid'))
+                    return <Button  color={'neutral'} onClick={handleReview}>Write a Review</Button>},
       ignoreRowClick: true,
       allowOverflow: true,
       button: true,

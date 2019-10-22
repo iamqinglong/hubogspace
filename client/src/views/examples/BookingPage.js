@@ -2,6 +2,8 @@ import React,{useState,useEffect} from "react";
 import Datetime from "react-datetime";
 import StripeCheckout from 'react-stripe-checkout'
 import moment from 'moment'
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 // reactstrap components
 import {
   Button,
@@ -20,16 +22,14 @@ import {
 } from "reactstrap";
 
 // core components
-import ProfilePageHeader from "components/Headers/ProfilePageHeader.js";
-import DefaultFooter from "components/Footers/DefaultFooter.js";
 import NavbarComponent from "components/Navbars/NavbarComponent";
-import MyBookingsPage from "./MyBookingsPage";
 import axios from 'axios'
 import cookie from 'js-cookie'
-function BookingPage(props) {
+toast.configure()
+const BookingPage =(props)=> {
   const [pills, setPills] = useState("1");
   const [paymentMode, setPaymentMode] = useState(null);
-  const [checkIn, setCheckIn] = useState(null)
+  const [expectedArrival, setExpectedArrival] = useState(null)
   const [checkOut, setCheckOut] = useState(null)
   const [warning, setWarning] = useState(false)
   const [amount, setAmount] = useState(0)
@@ -43,65 +43,64 @@ function BookingPage(props) {
     try {
       axios.defaults.headers.common['Authorization'] = `Bearer ${cookie.get('token')}`;
       const space = props.location.state.space
-      const res = await axios.post(`http://localhost:8000/api/payWithStripe`,{token,space,amount,checkIn,checkOut})
-      props.history.push('/mybookings')
+      const res = await axios.post(`http://localhost:8000/api/bookAndPayStripe`,{token,space,expectedArrival})
+      if(res.data.state){
+        toast.success(res.data.message, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          });
+        props.history.push('/mybookings')
+      }
+      else{
+        toast.warn(res.data.message, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          });
+      }
+      
       console.log(res.data)
     } catch (error) {
       console.log(error)
     }
 
   }
-  const handleCheckIn = async (value) => {
+  const handleExpectedArrival = async (value) => {
     
     if((checkOut !== null && moment.isMoment(checkOut) === true)){
       const time = moment(value).format('HH:mm')
       setCheckOut(checkOut.set({hour: time.split(':')[0], minute: time.split(':')[1]}))
     }
       
-    setCheckIn(value)
+    setExpectedArrival(value)
     setDisable(false)
 
   }
-  const handleCheckOut = async (value) => {
-    const time = moment(checkIn).format('HH:mm')
-    // const newValue = value.add(time.split(':')[0],'hours').add(time.split(':')[1],'minutes')
-    // console.log(newValue)
-    setCheckOut(value.set({hour: time.split(':')[0], minute: time.split(':')[1]}))
-  }
+ 
+
   const changeTab = async (e,value)=> {
     e.preventDefault();
-    if(value === "2") {
-      if(checkIn === null || moment.isMoment(checkIn) === false)
-      {
-        
-        setWarning('Check-in either null or not valid')
-        return
-      }
-      if((checkOut === null || moment.isMoment(checkOut) === false))
-      {
-        setWarning('Check-out either null or not valid')
-        return
-      }
-      if(checkOut.isBefore(checkIn) || checkOut.isSame(checkIn))
-      {
-        setWarning('Check-out need before the Check-in')
-        return
-      }
-      // if(checkOut.isSame(checkIn))
-      // {
-      //   console.log('same')
-      //   setWarning(true)
-      //   return
-      // }
-      if(checkIn.isBefore(Datetime.moment()))
-      {
-        setWarning('Check the Check-in time')
-        return
-      }
+  
+    if(expectedArrival === null || moment.isMoment(expectedArrival) === false)
+    {
+      
+      setWarning('Choosed date either null or not valid')
+      return
     }
+    if(expectedArrival.isBefore(Datetime.moment()))
+      {
+        setWarning('Check the time')
+        return
+      }
     setPills(value)
     setWarning(false)
-    calAmount()
   }
   
   const valid = ( current ) =>{
@@ -109,14 +108,25 @@ function BookingPage(props) {
       return current.isAfter( yesterday );
   };
 
-
-  const calAmount = () => {
-    const diff = checkOut.diff(checkIn,'days')
-    if(diff === 0){
-      setAmount( (props.location.state.space.price*100) )
-    }
-    else{
-      setAmount( (props.location.state.space.price*100) * diff )
+  const handleBook =async ()=> {
+    try {
+      axios.defaults.headers.common['Authorization'] = `Bearer ${cookie.get('token')}`;
+      const space = props.location.state.space
+      const res = await axios.post(`http://localhost:8000/api/book`,{space,expectedArrival})
+      if(res.data.state)
+      {
+        toast.success(res.data.message, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          });
+          props.history.push('/mybookings')
+      }
+    } catch (error) {
+      console.log(error)
     }
   }
   useEffect(() => {
@@ -136,7 +146,12 @@ function BookingPage(props) {
           <Container>
             <Row>
               <Col className="ml-auto mr-auto" md="6">
-                <h4 className="title text-center">My Portfolio</h4>
+                <h4 className="title text-center">{pills === '1' ? 'Choose date': 'Choose Payment Method'}</h4>
+                {
+                      warning ? (
+                        <h4 className="title text-center" style={{color:'red'}}>{warning}</h4>
+                        ) : null
+                }
                 <div className="nav-align-center">
                   <Nav
                     className="nav-pills-info nav-pills-just-icons"
@@ -172,31 +187,14 @@ function BookingPage(props) {
                 <Col className="ml-auto mr-auto" md="12">
                     
                     <Row>
-                    {
-                      warning ? (<label className="text-center">
-                                <strong style={{color:'red'}}>
-                                {warning}
-                                </strong>
-                                </label>) : null
-                    }
+                   
                     </Row>
                     <Row>
-                    <label className="text-center">Check-in</label>
+                    <label className="text-center">Expected Arrival</label>
                     <FormGroup>
                             <Datetime
-                                inputProps={{ placeholder: "Check-in/Arrival" }}
-                                onChange={handleCheckIn}
-                                isValidDate={ valid }
-                            />
-                        </FormGroup>
-                    </Row>
-                    <Row>
-                    <label className="text-center">Check-out</label>
-                    <FormGroup>
-                            <Datetime
-                                timeFormat={false}
-                                inputProps={{ placeholder: "Checkout",disabled: disable }}
-                                onChange={handleCheckOut}
+                                inputProps={{ placeholder: "Expected Arrival" }}
+                                onChange={handleExpectedArrival}
                                 isValidDate={ valid }
                             />
                         </FormGroup>
@@ -206,48 +204,49 @@ function BookingPage(props) {
                 </TabPane>
                 <TabPane tabId="pills2">
                 <Col className="ml-auto mr-auto" md="12">
-                    
-                    <div style={{marginLeft:'66px'}}>
-                    {
-                      props.location.state.space.payments.map(payment => 
-                           <FormGroup key={payment.id} check className="form-check-radio" inline>
-                                  <Label check>
-                                  <Input
-                                      id="inlineRadio1"
-                                      name="inlineRadioOptions"
-                                      type="radio"
-                                      value={payment.name}
-                                      onChange={handleCheck}
-                                  ></Input>
-                                  {payment.name} <span className="form-check-sign"></span>
-                                  </Label>
-                              </FormGroup>
-                      )
+                    <Container>
+                      <Row>
+                      {
+                      props.location.state.space.payments.map((payment,index) => {
+                          if(payment.name === 'Cash'){
+                            return (
+                              <Col key={index}>
+                              <Button
+                              block
+                              className="btn-round"
+                              color="info"
+                              size="lg"
+                              onClick={handleBook}
+                              >Pay in Cash
+                              
+                              </Button>
+                              </Col>
+                            )
+                          }
+                          else if(payment.name ==='Card'){
+                              return(
+                                <Col key={index}>
+                                  <StripeCheckout 
+                                      style={{
+                                        position: 'relative',
+                                        bottom: '-26px'
+                                      }}
+                                      stripeKey={'pk_test_XtHFdL6fP8UPdJCiWTN2ZmGc00gzVZ1ZxB'}
+                                      token={handleToken}
+                                      amount={props.location.state.space.price*100}
+                                      product={props.location.state.space}
+                                      currency={'USD'}
+                                  />
+                                </Col>
+                              )
+                          }
+                        
+                      })
+                           
+                      
                     }
-                    {
-                        paymentMode === 'Cash' ? (
-                            <Button
-                            block
-                            className="btn-round"
-                            color="info"
-                            href="#pablo"
-                            size="lg"
-                            style={{marginLeft: '-26px'}}
-                            >Book Now</Button>
-                            
-                        ) : paymentMode === 'Card' ? (<StripeCheckout 
-                            style={{
-                                display: 'flex',
-                                marginLeft: '7px'
-                            }}
-                            stripeKey={'pk_test_XtHFdL6fP8UPdJCiWTN2ZmGc00gzVZ1ZxB'}
-                            token={handleToken}
-                            amount={amount}
-                            product={props.location.state.space}
-                            currency={'usd'}
-                        />) : null
-                    }
-                    </div> 
+                      </Row>
+                    </Container>
                 </Col>
                 </TabPane>
             </TabContent>

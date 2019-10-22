@@ -145,15 +145,17 @@ function NavbarComponent(props) {
                           (<DropdownItem to="/setup-page" tag={Link}>
                             <i className="now-ui-icons ui-1_settings-gear-63"></i>
                             Setup
-                          </DropdownItem>) ): ('')
+                          </DropdownItem>) ): (
+                            <DropdownItem
+                              to="/mybookings" tag={Link}
+                            >
+                              <i className="now-ui-icons education_agenda-bookmark"></i>
+                              My Bookings 
+                            </DropdownItem>
+                          )
                     }
                     
-                    <DropdownItem
-                      to="/mybookings" tag={Link}
-                    >
-                      <i className="now-ui-icons education_agenda-bookmark"></i>
-                      My Bookings 
-                    </DropdownItem>
+                    
                     <DropdownItem
                       onClick={logout}
                       target="_blank"
