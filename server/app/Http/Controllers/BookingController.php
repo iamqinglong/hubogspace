@@ -26,7 +26,7 @@ class BookingController extends Controller
     {
         $status = [ (object)[
             'key'=> 'book',
-            'value' => 'Just book',
+            'value' => 'Just Booked',
             'date' => Carbon::parse(time())->setTimezone('Asia/Singapore')->toDateTimeString()
         ]];
 
@@ -50,5 +50,9 @@ class BookingController extends Controller
         $space = Booking::where('space_id',auth()->user()->space->id)->with('user')->get();
         return response()->json($space);
 
+    }
+    public function getSpaceWithBookings(){
+        $space = Space::where('user_id',auth()->user()->id)->with('bookings.user')->get();
+        return response()->json($space);
     }
 }

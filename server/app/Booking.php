@@ -14,6 +14,7 @@ class Booking extends Model
     protected $casts = [
         'statuses' => 'array'
     ];
+    
     protected $fillable = [
         'expected_arrival', 'space_id', 'payment_id', 'user_id', 'statuses'
     ];

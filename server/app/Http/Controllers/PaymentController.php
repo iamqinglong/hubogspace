@@ -9,6 +9,7 @@ use Stripe\Charge;
 use Stripe\Stripe;
 use Stripe\Transfer;
 use App\Space;
+use App\Services\Stripe\Transaction;
 
 class PaymentController extends Controller
 {
@@ -19,7 +20,7 @@ class PaymentController extends Controller
     }
     public function bookAndPayStripe(Request $request)
     {
-        try {
+        // try {
             $space = Space::find($request->space['id']);
             $owner = $space->user;
             $payout = $this->stripeAmountFormat($request->space['price']) * 0.50;
@@ -52,21 +53,62 @@ class PaymentController extends Controller
                 'user_id' =>     auth()->user()->id,
                 'payment_id' =>  2,// 2 is the payment_id of card
                 'statuses' =>    $status,
-                ]);
+            ]);
             
             return response()->json([
                 'message' => 'Book and Charge successful, Thank you!',
                 'booking' => $booking,
                 'state' => true
             ]); 
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'There were some issue with the payment. Please try again later.',
-                'state' => false
-            ]);
-        }
+        // } catch (\Exception $e) {
+        //     return response()->json([
+        //         'message' => 'There were some issue with the payment. Please try again later.',
+        //         'state' => false
+        //     ]);
+        // }
        
       
+    }
+    public function payInCash(Booking $booking){
+        
+        $status = (object) [
+            'key'=> 'paid',
+            'value' => 'Paid in cash',
+            'date' => Carbon::parse(time())->setTimezone('Asia/Singapore')->toDateTimeString()
+        ];
+        $stats = $booking->statuses;
+        array_push($stats,$status);
+        $booking->statuses = $stats;
+        $booking->save();
+
+        return response()->json([
+            'message' => 'Paid in cash successful, Thank you',
+            'state' => true
+        ]);
+      
+    }
+
+    public function payWithStripe(Booking $booking){
+
+        $charge_id = Transaction::create(auth()->user(), request()->token['id'],$booking->space->price);
+
+        $status = (object) [
+            'key'=> 'paid',
+            'value' => 'Paid in cash',
+            'charge_id' => $charge_id,
+            'date' => Carbon::parse(time())->setTimezone('Asia/Singapore')->toDateTimeString()
+        ];
+
+        $stats = $booking->statuses;
+        array_push($stats,$status);
+        $booking->statuses = $stats;
+        $booking->save();
+
+        return response()->json([
+            'message' => 'Paid with Stripe successful, Thank you',
+            'state' => true
+        ]);
+
     }
 
     public function stripeAmountFormat($amount)

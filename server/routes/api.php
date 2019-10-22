@@ -29,27 +29,27 @@ Route::group([
     Route::post('refresh', 'AuthController@refresh');
     Route::post('me', 'AuthController@me');
     Route::post('register', 'AuthController@register');
-
+    
 });
+
+
 
 Route::group(['middleware' => 'api'], function() {
 
     Route::resource('spaces', 'SpaceController');
     Route::get('getSpace', 'SpaceController@getSpace');
     Route::get('getAllSpaces', 'SpaceController@getAllSpaces');
-});
-
-Route::group(['middleware' => 'api'], function() {
+    Route::post('stripe', 'SpaceController@saveStripe');
 
     Route::post('bookAndPayStripe', 'PaymentController@bookAndPayStripe');
-    Route::post('stripe', 'SpaceController@saveStripe');
-});
-
-Route::group(['middleware' => 'api'], function() {
+    Route::post('payInCash/{booking}', 'PaymentController@payInCash');
+    Route::post('payWithStripe/{booking}', 'PaymentController@payWithStripe');
 
     Route::get('getMyBookings', 'BookingController@getMyBookings');
     Route::post('book', 'BookingController@book');
     Route::post('getSpaceBooking', 'BookingController@getSpaceBooking');
-    
+    Route::post('getSpaceWithBookings', 'BookingController@getSpaceWithBookings');
+    Route::post('check_in/{booking}', 'PaymentController@check_in');
 });
+
 
