@@ -57,9 +57,15 @@ const SignUpPage =(props)=> {
         role : role,
       }
       const res = await axios.post('http://localhost:8000/api/auth/register',data)
+
       cookie.set("token", res.data.access_token)
       dispatch(setLogin(res.data.user))
-      props.history.push('/')
+      if(res.data.user.role === 'lessor'){
+        props.history.push('/setup-page')
+      }else{
+        props.history.push('/')
+      }
+      
     } catch (error) {
       setErrors(error.response.data.errors)
     }

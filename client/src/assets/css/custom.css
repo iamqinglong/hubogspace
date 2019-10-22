@@ -275,3 +275,11 @@ a:hover {
   user-select: none;
   margin-left: 5px;
 }
+
+.custom-group-text {
+  background-color: #E3E3E3;
+  border: 1px solid #E3E3E3;
+  border-radius: 30px;
+  color: #555555;
+  transition: color 0.3s ease-in-out, border-color 0.3s ease-in-out, background-color 0.3s ease-in-out;
+}

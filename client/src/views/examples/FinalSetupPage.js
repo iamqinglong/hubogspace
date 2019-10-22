@@ -19,14 +19,13 @@ import DefaultFooter from "components/Footers/DefaultFooter.js";
 import NavbarComponent from "components/Navbars/NavbarComponent";
 
 function FinalSetupPage(props) {
-  const [firstFocus, setFirstFocus] = useState(false);
-  const [lastFocus, setLastFocus] = useState(false);
+  const [message, setMessage] = useState('');
   const token = cookie.get('token')
   const saveStripe = async (code) => {
     try {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       const res = await axios.post(`http://localhost:8000/api/stripe`,{code:code})
-      console.log(res.data)
+      setMessage(res.data.message)
     } catch (error) {
       console.log(error)
     }
@@ -52,7 +51,7 @@ function FinalSetupPage(props) {
         
         <div className="section section-contact-us text-center">
           <Container>
-            <h2 className="title">Successfully Space Setup</h2>
+            <h2 className="title">{message === '' ? (message):('Loading.....')}</h2>
           </Container>
         </div>
       </div>

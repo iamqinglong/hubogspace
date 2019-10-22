@@ -45,7 +45,7 @@ import jwt from 'jsonwebtoken'
 import ControlPanelPage from "views/examples/ControlPanelPage";
 import FinalSetupPage from "views/examples/FinalSetupPage";
 let token = cookie.get('token')
-const jwt_secret = 'fbAYQZ05XSysaHOqGVwntyyNs8kDsoTOlCJAhQ1MPNJgv8xszCo5ZB8rUVlX0ebr'
+const jwt_secret = 'N3uJKf77wT8V62DufhaPu666dDm624qZzUGHOV2TK4kgLcFSarPna7j0I2YVEEFG'
 
 if(token) {
   jwt.verify(token, jwt_secret, (err, decoded)=> {
@@ -71,9 +71,10 @@ const render = () => {
         <Switch>
           <Switch>
             {/* <Route path="/index" render={props => <Index {...props} />} /> */}
-            <Route
+            <AuthRoute
               path="/mybookings"
               render={props => <MyBookingsPage {...props} />}
+              component={MyBookingsPage}
             />
             <AuthRoute
               path="/booking-page"

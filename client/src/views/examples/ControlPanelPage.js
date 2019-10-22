@@ -163,7 +163,7 @@ function ControlPanelPage() {
                                     onFocus={() => setPriceFocus(true)}
                                     onBlur={() => setPriceFocus(false)}
                                     onChange={(e) => {handleOnChange(e,setPrice)}}
-                                    value={space.price || ''}
+                                    value={(space.price) || ''}
                                 ></Input>
                                 </InputGroup>
                                 <InputGroup className={contactFocus ? "input-group-focus" : ""}>
