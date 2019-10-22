@@ -15,10 +15,10 @@ class Booking extends Model
         'statuses' => 'array'
     ];
     protected $fillable = [
-        'check_in','check_out', 'space_id', 'payment_id', 'user_id', 'statuses'
+        'expected_arrival', 'space_id', 'payment_id', 'user_id', 'statuses'
     ];
     protected $dates = [
-        'check_in', 'check_out'
+        'expected_arrival',
     ];
     public function user()
     {

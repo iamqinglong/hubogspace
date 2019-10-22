@@ -17,15 +17,15 @@ class PaymentController extends Controller
     {
         $this->middleware('auth:api', ['except' => []]);
     }
-    public function payWithStripe(Request $request)
+    public function bookAndPayStripe(Request $request)
     {
         try {
             $space = Space::find($request->space['id']);
             $owner = $space->user;
-            $payout = $request->amount * 0.50;
+            $payout = $this->stripeAmountFormat($request->space['price']) * 0.50;
             Stripe::setApiKey(env('STRIPE_SECRET'));
             $charge = Charge::create ([
-                    "amount" => $request->amount,
+                    "amount" => $this->stripeAmountFormat($request->space['price']),
                     "currency" => "usd",
                     "source" => $request->token['id'],  
                     "description" => "Thank you for patronizing" 
@@ -38,16 +38,16 @@ class PaymentController extends Controller
                 'destination' => $owner->stripe_connect_id
             ]);
 
-            $status = [
+            $status = [ (object)[
                 'key'=> 'paid',
                 'value' => 'Paid with Card',
                 'charge_id' => $charge->id,
-                'date' => time()
-            ];
-            // return response()->json($status);
+                'date' => Carbon::parse(time())->setTimezone('Asia/Singapore')->toDateTimeString()
+            ]];
+
             $booking = Booking::create([
-                'check_in' =>    Carbon::parse($request->checkIn)->setTimezone('Asia/Singapore')->toDateTimeString(),
-                'check_out' =>  Carbon::parse($request->checkOut)->setTimezone('Asia/Singapore')->toDateTimeString(),
+                'expected_arrival' =>    Carbon::parse($request->expectedArrival)->setTimezone('Asia/Singapore')->toDateTimeString(),
+                // 'check_out' =>  Carbon::parse($request->expectedArrival)->setTimezone('Asia/Singapore')->toDateTimeString(),
                 'space_id' =>    $request->space['id'],
                 'user_id' =>     auth()->user()->id,
                 'payment_id' =>  2,// 2 is the payment_id of card
@@ -55,17 +55,22 @@ class PaymentController extends Controller
                 ]);
             
             return response()->json([
-                'message' => 'Charge successful, Thank you for payment!',
+                'message' => 'Book and Charge successful, Thank you!',
                 'booking' => $booking,
-                'state' => 'success'
+                'state' => true
             ]); 
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'There were some issue with the payment. Please try again later.',
-                'state' => 'error'
+                'state' => false
             ]);
         }
        
       
+    }
+
+    public function stripeAmountFormat($amount)
+    {
+        return $amount * 100;
     }
 }
