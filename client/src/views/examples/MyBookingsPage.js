@@ -139,7 +139,8 @@ function MyBookingsPage() {
       ignoreRowClick: true,
       allowOverflow: true,
       button: true,
-    },{
+    },
+    {
       
       cell: (row) => {
         if(row.space.payments.some(status => status.name === 'Card') && !row.statuses.some(status => status.key === 'paid'))

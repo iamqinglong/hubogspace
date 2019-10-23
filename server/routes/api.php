@@ -51,7 +51,7 @@ Route::group(['middleware' => 'api'], function() {
     Route::post('book', 'BookingController@book');
     Route::post('getSpaceBooking', 'BookingController@getSpaceBooking');
     Route::post('getSpaceWithBookings', 'BookingController@getSpaceWithBookings');
-    Route::post('check_in/{booking}', 'PaymentController@check_in');
+    Route::post('checkIn/{booking}', 'BookingController@checkIn');
 });
 
 

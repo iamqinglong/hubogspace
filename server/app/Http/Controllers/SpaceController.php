@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Illuminate\Support\Facades\Validator;
 use App\Space;
 use App\Image;
 use Illuminate\Http\Request;
@@ -46,16 +46,16 @@ class SpaceController extends Controller
     {
         
         $request->validate([
-            'name'    => 'required',
-            'price'    => 'required',
+            'name'    => 'required|unique:spaces',
+            'price'    => 'required|numeric|gt:0',
             'contact'   => 'required|numeric|digits:11',
             'description'=> 'required|max:255',
             'payments' => 'required|min:1',
             'address' => 'required',
             'pictures' => 'required',
             'pictures.*.file' => 'file|image|max:5000|mimes:jpeg,png,jpg',
-            'longitude' => 'required',
-            'latitude' => 'required',
+            'longitude' => 'required|numeric',
+            'latitude' => 'required|numeric',
         ]);
         
         $space = Space::create([
@@ -68,10 +68,11 @@ class SpaceController extends Controller
                     'latitude' =>    $request->latitude,
                     'user_id' =>    $request->user_id,
                     ]);
+
         $space->payments()->sync(request('payments'));
         foreach ($request->pictures as $image) {
             Image::create([
-                'space_id' => 1,
+                'space_id' => $space->id,
                 'filename' => $image->store('uploads','public')
             ]);
         }

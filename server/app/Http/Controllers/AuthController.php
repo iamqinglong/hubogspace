@@ -90,6 +90,8 @@ class AuthController extends Controller
                 'updated_at' => auth()->user()->update_at,
                 'created_at' => auth()->user()->created_at,
                 'space_name' => auth()->user()->space->name,
+                'stripe_connect_id' => auth()->user()->stripe_connect_id,
+                'payments' => auth()->user()->space->payments,
             ];
         }
         return response()->json($user);
@@ -147,6 +149,8 @@ class AuthController extends Controller
                 'updated_at' => auth()->user()->update_at,
                 'created_at' => auth()->user()->created_at,
                 'space_name' => auth()->user()->space->name,
+                'stripe_connect_id' => auth()->user()->stripe_connect_id,
+                'payments' => auth()->user()->space->payments,
             ];
         }
         

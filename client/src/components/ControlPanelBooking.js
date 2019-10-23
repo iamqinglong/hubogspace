@@ -6,7 +6,7 @@ import cookie from 'js-cookie'
 import StripeCheckout from 'react-stripe-checkout'
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
+import SignatureCanvas from 'react-signature-canvas'
 //components
 import { 
   Button, 
@@ -22,6 +22,8 @@ const ControlPanelBooking = (props) => {
   const [selectedMethod, setSelectedMethod] = useState('');
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('cash');
   const [selectedRow, setSelectedRow] = useState(null);
+  const [sigPad, setSigPad] = useState({});
+  const [trimmedDataURL, setTrimmedDataURL] = useState(null);
   const token = cookie.get('token')
 
   const handleClickSelectedMethod = async () => {
@@ -44,8 +46,10 @@ const ControlPanelBooking = (props) => {
         console.log(error)
       }
     }
-    else if(selectedMethod === 'check_in'){
-      // const res = await axios.post(`http://localhost:8000/api/check_in/${selectedRow.id}`)
+    else if(selectedMethod === 'checkIn'){
+      
+      setTrimmedDataURL( sigPad.getTrimmedCanvas().toDataURL('image/png') )
+     
       // console.log(res.data)
       // toast.success(res.data.message, {
       //   position: "top-right",
@@ -55,7 +59,7 @@ const ControlPanelBooking = (props) => {
       //   pauseOnHover: true,
       //   draggable: true,
       //   });
-        setModalLive(false)
+        // setModalLive(false)
     }
   }
 
@@ -63,6 +67,35 @@ const ControlPanelBooking = (props) => {
     setSelectedPaymentMethod(e.target.value)
   }
 
+  const checkIn =async ()=> {
+    try {
+   
+        
+        const fd = new FormData()
+        fd.append('signature',trimmedDataURL)
+
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        const res = await axios.post(`http://localhost:8000/api/checkIn/${selectedRow.id}`,fd, { headers: {
+          'Content-Type': 'multipart/form-data'
+        }})
+        
+       if(res.data.state){
+          toast.success(res.data.message, {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            });
+          updateBookings(res.data.booking[0])
+          setModalLive(false)
+       }
+       
+    } catch (error) {
+      console.log(error)
+    }
+  }
   const handleToken = async(token,addresses)=>{
     console.log(token,addresses)
     try {
@@ -109,13 +142,7 @@ const ControlPanelBooking = (props) => {
     console.log(newData)
     setSpaceWithBookings([...newData])
   }
-  useEffect(() => {
-    getSpaceWithBookings()
-  }, [])
 
-  useEffect(() => {
-    console.log(spaceWithBookings)
-  }, [spaceWithBookings])
   const getSpaceWithBookings =async()=> {
     try {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
@@ -126,6 +153,20 @@ const ControlPanelBooking = (props) => {
       console.log(error)
     }
   }
+
+  useEffect(() => {
+    getSpaceWithBookings()
+  }, [])
+
+  useEffect(() => {
+    console.log(selectedRow)
+  }, [selectedRow])
+
+  useEffect(() => {
+    if(trimmedDataURL !== null)
+      checkIn()
+  }, [trimmedDataURL])
+  
   
   const columns = useMemo(() => [
   
@@ -166,7 +207,7 @@ const ControlPanelBooking = (props) => {
     },
     {
       cell: (row) => {
-        if(!row.statuses.some(status => status.key === 'checkIn'))
+        if(row.statuses.some(status => status.key === 'paid') && !row.statuses.some(status => status.key === 'checkIn'))
           return <Button color="primary" size="md" type="button" onClick={()=>{
             setModalLive(true)
             setSelectedMethod('checkIn')
@@ -179,7 +220,7 @@ const ControlPanelBooking = (props) => {
     },
     {
       cell: (row) => {
-        if(!row.statuses.some(status => status.key === 'checkOut'))
+        if(row.statuses.some(status => status.key === 'paid') && !row.statuses.some(status => status.key === 'checkOut'))
           return <Button color="primary" size="md" type="button" onClick={()=>{
             setModalLive(true)
             setSelectedMethod('checkOut')
@@ -199,18 +240,34 @@ const ControlPanelBooking = (props) => {
         columns={columns}
         pagination
       />
-      <Modal toggle={() => setModalLive(false)} isOpen={modalLive}>
+      <Modal 
+      
+      toggle={() => setModalLive(false)} 
+      isOpen={modalLive} 
+      onClosed={()=> {
+      setSelectedPaymentMethod('cash')
+      setSelectedRow(null)
+      setModalLive(false)
+      }}
+      
+      >
         <div className="modal-header">
         <h5 className="modal-title" id="exampleModalLiveLabel">
           {
-            selectedMethod === 'pay' && ('Payment')
+            selectedMethod === 'pay' ? ('Payment') : (
+              selectedMethod === 'checkIn' ? ('Check-in') : ('Check-Out')
+            )
           }
           </h5>
           <button
             aria-label="Close"
             className="close"
             type="button"
-            onClick={() => setModalLive(false)}
+            onClick={() => {
+              setSelectedPaymentMethod('cash')
+              setModalLive(false)
+              setSelectedRow(null)
+            }}
           >
             <span aria-hidden={true}>×</span>
           </button>
@@ -223,7 +280,7 @@ const ControlPanelBooking = (props) => {
                   <Input onChange={handleSelectPaymentMethod} type="select">
                     <option value="cash">Pay in Cash</option>
                     {
-                      selectedRow.payment === 1 ? (
+                      spaceWithBookings[0].payments.some(status => status.name === 'Card') ? (
                         <option value="stripe">Pay with Stripe</option>
                       ):('')
                     }
@@ -233,7 +290,15 @@ const ControlPanelBooking = (props) => {
                   <h5>Price: $ <b>{spaceWithBookings[0].price}</b></h5>
                 </>
               ) : (
-                ''
+                selectedMethod === 'checkIn' ? (
+                  <>
+                    <b className="text-center">Draw your Signature below</b>
+                    <SignatureCanvas penColor='black'
+                    backgroundColor='rgba(0,0,0,0)'
+                    ref={(ref) => { setSigPad(ref) }}
+                    canvasProps={{width: 450, height: 200, className: 'sigCanvas'}} />
+                  </>
+                ):('CheckOut')
               )
             }
         </div>
@@ -241,7 +306,11 @@ const ControlPanelBooking = (props) => {
           <Button
             color="secondary"
             type="button"
-            onClick={() => setModalLive(false)}
+            onClick={() => {
+              setSelectedPaymentMethod('cash')
+              setModalLive(false)
+              setSelectedRow(null)
+            }}
           >
             Close
           </Button>

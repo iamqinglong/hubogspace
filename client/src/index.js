@@ -45,7 +45,7 @@ import jwt from 'jsonwebtoken'
 import ControlPanelPage from "views/examples/ControlPanelPage";
 import FinalSetupPage from "views/examples/FinalSetupPage";
 let token = cookie.get('token')
-const jwt_secret = 'N3uJKf77wT8V62DufhaPu666dDm624qZzUGHOV2TK4kgLcFSarPna7j0I2YVEEFG'
+const jwt_secret = '2gZ7DQQHoP2cvxuArBFktdunlJNcGItYuzot3GG3F5N9f3eC1wD2Fg5Zzn7phFoF'
 
 if(token) {
   jwt.verify(token, jwt_secret, (err, decoded)=> {

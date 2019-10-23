@@ -66,7 +66,7 @@ function NavbarComponent(props) {
       const res = await axios.post('http://localhost:8000/api/auth/logout')
       cookie.remove('token')
       dispatch(setLogout())
-      props.history.push('/login-page')
+      window.location.assign('http://localhost:3000/login-page')
     } catch (error) {
       console.log(error)
     }
@@ -154,10 +154,15 @@ function NavbarComponent(props) {
                             <DropdownItem to="/control-panel-page" tag={Link}>
                                 <i className="now-ui-icons ui-1_settings-gear-63"></i>
                                 Control Panel
-                              </DropdownItem>
-                              <DropdownItem onClick={handleStripe}>
-                              My Stripe
                             </DropdownItem>
+                            {
+                              user.payments.some(status => status.name === 'Card') ? (
+                                <DropdownItem onClick={handleStripe}>
+                                My Stripe
+                                </DropdownItem>
+                              ) : ('')
+                            }
+                            
                           </>
                           
                         ):

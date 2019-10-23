@@ -75,6 +75,7 @@ const markerClick = async (e,space) => {
 
   useEffect(() =>{
       getAllSpaces()
+      getUserLocation()
       // getDirections(viewport.longitude,viewport.latitude,userLocation.longitude,userLocation.latitude)
   },[])
 

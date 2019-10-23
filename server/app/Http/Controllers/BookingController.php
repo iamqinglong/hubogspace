@@ -8,9 +8,17 @@ use App\User;
 use App\Space;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Uuid;
+
 class BookingController extends Controller
 {
     //
+    public function __construct()
+    {
+        $this->middleware('auth:api', ['except' => []]);
+    }
+
     public function getMyBookings() 
     {
         $bookings = Booking::where('user_id', auth()->user()->id)
@@ -45,14 +53,48 @@ class BookingController extends Controller
         ]); 
 
     }
+
     public function getSpaceBooking() 
     {
         $space = Booking::where('space_id',auth()->user()->space->id)->with('user')->get();
         return response()->json($space);
 
     }
+
     public function getSpaceWithBookings(){
-        $space = Space::where('user_id',auth()->user()->id)->with('bookings.user')->get();
+        $space = Space::where('user_id',auth()->user()->id)
+                        ->with(['payments','bookings.user'])
+                        ->get();
         return response()->json($space);
+    }
+
+    public function checkIn(Booking $booking) {
+
+        $image = request('signature');  // your base64 encoded
+        $image = str_replace('data:image/png;base64,', '', $image);
+        $image = str_replace(' ', '+', $image);
+        $imageName = Uuid::generate(4)->string . '.png';
+
+        Storage::disk('local')->put($imageName, base64_decode($image));
+        
+        $status = (object) [
+            'key'=> 'checkIn',
+            'value' => 'Checked-in',
+            'image' => $imageName,
+            'date' => Carbon::parse(time())->setTimezone('Asia/Singapore')->toDateTimeString()
+        ];
+
+        $data = $booking->statuses;
+        array_push($data,$status);
+        $booking->statuses = $data;
+        $booking->save();
+
+        $retrieveBooking = Booking::where('id',$booking->id)->with('user')->get();
+
+        return response()->json([
+            'message' => 'Checked-in successful, Thank you!',
+            'booking' => $retrieveBooking,
+            'state' => true
+        ]);
     }
 }

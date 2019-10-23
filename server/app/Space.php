@@ -10,8 +10,8 @@ use App\Booking;
 
 class Space extends Model
 {
-    //
     protected $fillable = ['name','price','contact','description','address','longitude','latitude','user_id'];
+
     public function payments(){
         return $this->belongsToMany(Payment::class)->withTimestamps();
     }
@@ -28,6 +28,6 @@ class Space extends Model
 
     public function bookings()
     {
-        return $this->hasMany(Booking::class);
+        return $this->hasMany(Booking::class)->orderBy('created_at','DESC');;
     }
 }

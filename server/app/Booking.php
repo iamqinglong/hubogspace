@@ -31,8 +31,8 @@ class Booking extends Model
         return $this->belongsTo(Space::class);
     }
 
-    public function payment(){
-        return $this->belongsTo(Payment::class);
+    public function payments(){
+        return $this->belongsToMany(Payment::class)->withTimestamps();
     }
     
     // public function bookings()
