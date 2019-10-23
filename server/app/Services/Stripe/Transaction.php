@@ -6,7 +6,7 @@ use App\User;
 use Stripe\Charge;
 use Stripe\Stripe;
 use Stripe\Transfer;
-
+use Stripe\Payout;
 class Transaction
 {
     public static function create(User $user, $token_id, $price)

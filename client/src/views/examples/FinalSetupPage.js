@@ -51,7 +51,7 @@ function FinalSetupPage(props) {
         
         <div className="section section-contact-us text-center">
           <Container>
-            <h2 className="title">{message === '' ? (message):('Loading.....')}</h2>
+            <h2 className="title">{message === '' ?('Loading...') :(message)}</h2>
           </Container>
         </div>
       </div>

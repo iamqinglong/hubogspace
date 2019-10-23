@@ -11,13 +11,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import { 
   Button, 
   Modal,
-  InputGroup,
-  InputGroupAddon,
-  InputGroupText,
   Input } from "reactstrap";
 import DataTable from 'react-data-table-component'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faDollarSign} from '@fortawesome/free-solid-svg-icons'
 toast.configure()
 
 const ControlPanelBooking = (props) => {
@@ -43,6 +38,7 @@ const ControlPanelBooking = (props) => {
           pauseOnHover: true,
           draggable: true,
           });
+          updateBookings(res.data.data[0])
           setModalLive(false)
       } catch (error) {
         console.log(error)
@@ -82,20 +78,44 @@ const ControlPanelBooking = (props) => {
           pauseOnHover: true,
           draggable: true,
           });
+          
+          updateBookings(res.data.data[0])
+          
+      }
+      else{
+        toast.warn(res.data.message, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          });
       }
       setModalLive(false)
       
-      console.log(res.data)
+      // console.log(res.data)
     } catch (error) {
       console.log(error)
     }
 
   }
-
+  const updateBookings = (data) => {
+    console.log(data)
+    let newData = [...spaceWithBookings];
+    console.log(newData)
+    let bookings = newData[0].bookings.map(booking => (booking.id === data.id ? {...data} : booking) )
+    newData[0].bookings = [...bookings]
+    console.log(newData)
+    setSpaceWithBookings([...newData])
+  }
   useEffect(() => {
     getSpaceWithBookings()
   }, [])
 
+  useEffect(() => {
+    console.log(spaceWithBookings)
+  }, [spaceWithBookings])
   const getSpaceWithBookings =async()=> {
     try {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
@@ -127,7 +147,7 @@ const ControlPanelBooking = (props) => {
       name: 'Latest Status',
       selector: 'statuses.value',
       cell: (row) =>  {
-        row.statuses.sort((a, b) => (a.date > b.date) ? -1 : 1)
+        row.statuses.sort((a, b) => (a.date > b.date) ? 1 : -1)
         return row.statuses[row.statuses.length-1].value
       }
     },
@@ -177,6 +197,7 @@ const ControlPanelBooking = (props) => {
       <DataTable
         data={spaceWithBookings.length > 0 ? spaceWithBookings[0].bookings : []}
         columns={columns}
+        pagination
       />
       <Modal toggle={() => setModalLive(false)} isOpen={modalLive}>
         <div className="modal-header">
@@ -201,7 +222,12 @@ const ControlPanelBooking = (props) => {
                   <b className="text-center">Payment Method</b>
                   <Input onChange={handleSelectPaymentMethod} type="select">
                     <option value="cash">Pay in Cash</option>
-                    <option value="stripe">Pay with Stripe</option>
+                    {
+                      selectedRow.payment === 1 ? (
+                        <option value="stripe">Pay with Stripe</option>
+                      ):('')
+                    }
+                    
                   </Input>
                   <br/>
                   <h5>Price: $ <b>{spaceWithBookings[0].price}</b></h5>

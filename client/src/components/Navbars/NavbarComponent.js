@@ -71,6 +71,19 @@ function NavbarComponent(props) {
       console.log(error)
     }
   }
+
+  const handleStripe = async (e)=> {
+    e.preventDefault()
+    try {
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      const res = await axios.get('http://localhost:8000/api/auth/getStripeAccount')
+      // console.log(res.data)
+      window.location.assign(res.data.account.url)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   useEffect(() =>{
     console.log('navbar')
   },[])
@@ -137,10 +150,16 @@ function NavbarComponent(props) {
                     {
                       (user.role === 'lessor') ? (
                         (user.space_name) ? (
-                          <DropdownItem to="/control-panel-page" tag={Link}>
-                            <i className="now-ui-icons ui-1_settings-gear-63"></i>
-                            Control Panel
-                          </DropdownItem>
+                          <>
+                            <DropdownItem to="/control-panel-page" tag={Link}>
+                                <i className="now-ui-icons ui-1_settings-gear-63"></i>
+                                Control Panel
+                              </DropdownItem>
+                              <DropdownItem onClick={handleStripe}>
+                              My Stripe
+                            </DropdownItem>
+                          </>
+                          
                         ):
                           (<DropdownItem to="/setup-page" tag={Link}>
                             <i className="now-ui-icons ui-1_settings-gear-63"></i>

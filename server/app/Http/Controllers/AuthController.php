@@ -1,12 +1,14 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Stripe\Account;
+use Stripe\Stripe;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\Controller;
+// use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use App\User;
 use Symfony\Component\HttpFoundation\Response;
+
 
 class AuthController extends Controller
 {
@@ -153,6 +155,15 @@ class AuthController extends Controller
             'token_type' => 'bearer',
             'expires_in' => auth()->factory()->getTTL() * 60,
             'user' => $user,
+        ]);
+    }
+
+    public function getStripeAccount()
+    {
+        Stripe::setApiKey(config('services.stripe.secret'));
+        $account = Account::createLoginLink(auth()->user()->stripe_connect_id);
+        return response()->json([
+            'account' => $account
         ]);
     }
 }

@@ -29,6 +29,7 @@ Route::group([
     Route::post('refresh', 'AuthController@refresh');
     Route::post('me', 'AuthController@me');
     Route::post('register', 'AuthController@register');
+    Route::get('getStripeAccount', 'AuthController@getStripeAccount');
     
 });
 
@@ -44,6 +45,7 @@ Route::group(['middleware' => 'api'], function() {
     Route::post('bookAndPayStripe', 'PaymentController@bookAndPayStripe');
     Route::post('payInCash/{booking}', 'PaymentController@payInCash');
     Route::post('payWithStripe/{booking}', 'PaymentController@payWithStripe');
+    Route::post('bookerPayWithStripe/{booking}', 'PaymentController@bookerPayWithStripe');
 
     Route::get('getMyBookings', 'BookingController@getMyBookings');
     Route::post('book', 'BookingController@book');

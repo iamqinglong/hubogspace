@@ -283,3 +283,9 @@ a:hover {
   color: #555555;
   transition: color 0.3s ease-in-out, border-color 0.3s ease-in-out, background-color 0.3s ease-in-out;
 }
+
+.custom-page footer {
+  position: absolute;
+  bottom: -49px;
+  width: 100%;
+}

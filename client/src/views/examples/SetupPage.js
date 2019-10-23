@@ -107,6 +107,8 @@ function SetupPage(props) {
       })
       if(res.data.url !== undefined){
         window.location.assign(res.data.url)
+      }else{
+        props.history.push('/control-panel-page')
       }
     } catch (error) {
       
