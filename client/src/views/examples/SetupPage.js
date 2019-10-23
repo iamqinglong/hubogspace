@@ -14,7 +14,6 @@ import {
   Container,
   Row,
   Col,
-  FormFeedback,
   FormGroup,
   Label,
   Form,
@@ -67,8 +66,13 @@ function SetupPage(props) {
   }
 
   const handleCheckBoxClick = (e) => {
+
       if(e.target.checked)
         setPayments([...payments,e.target.value])
+      else{
+        setPayments(payments.filter(item => item !== e.target.value))
+      }
+      
   }
 
   const submit = async (e)=> {
@@ -111,6 +115,7 @@ function SetupPage(props) {
       })
       if(res.data.url !== undefined){
         window.location.assign(res.data.url)
+        console.log(res.data)
       }else{
         props.history.push('/control-panel-page')
       }
@@ -125,6 +130,10 @@ function SetupPage(props) {
   useEffect(() => {
     console.log(geolocation)
   }, [geolocation])
+
+  useEffect(() => {
+    console.log(payments)
+  }, [payments])
 
   return (
     <>

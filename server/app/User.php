@@ -9,6 +9,7 @@ use App\Role;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use App\Space;
 use App\Booking;
+use App\Review;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -78,6 +79,11 @@ class User extends Authenticatable implements JWTSubject
         
         return $this->hasMany(Booking::class);
         
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class)->orderBy('created_at','DESC');;
     }
     
 }

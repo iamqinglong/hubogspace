@@ -17,9 +17,6 @@ import {
   Row,
   Col,
   FormGroup,
-  Label,
-  Input,
-  Alert
 } from "reactstrap";
 
 // core components
@@ -29,16 +26,11 @@ import cookie from 'js-cookie'
 toast.configure()
 const BookingPage =(props)=> {
   const [pills, setPills] = useState("1");
-  const [paymentMode, setPaymentMode] = useState(null);
   const [expectedArrival, setExpectedArrival] = useState(null)
   const [checkOut, setCheckOut] = useState(null)
   const [warning, setWarning] = useState(false)
-  const [amount, setAmount] = useState(0)
-  const [disable, setDisable] = useState(true)
+  // const [disable, setDisable] = useState(true)
 
-  const handleCheck =(e) =>{
-    setPaymentMode(e.target.value)
-  }
   const handleToken = async(token,addresses)=>{
     console.log(token,addresses)
     try {
@@ -81,7 +73,7 @@ const BookingPage =(props)=> {
     }
       
     setExpectedArrival(value)
-    setDisable(false)
+    // setDisable(false)
 
   }
  

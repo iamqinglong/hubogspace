@@ -25,7 +25,6 @@ import "assets/scss/now-ui-kit.scss";
 import "assets/demo/demo.css";
 import "assets/demo/nucleo-icons-page-styles.css";
 // pages for this kit
-import Index from "views/Index.js";
 import NucleoIcons from "views/NucleoIcons.js";
 import LoginPage from "views/examples/LoginPage.js";
 import IndexPage from "views/examples/IndexPage";
@@ -44,8 +43,9 @@ import cookie from 'js-cookie'
 import jwt from 'jsonwebtoken'
 import ControlPanelPage from "views/examples/ControlPanelPage";
 import FinalSetupPage from "views/examples/FinalSetupPage";
+import TimeLineViewPage from "views/examples/TimeLineViewPage";
 let token = cookie.get('token')
-const jwt_secret = '2gZ7DQQHoP2cvxuArBFktdunlJNcGItYuzot3GG3F5N9f3eC1wD2Fg5Zzn7phFoF'
+const jwt_secret = 'nV3InvsPKnx006fMMdLgWcdeLPiG7BJcBD6SAIfWoLE5HejQK3ajVY4fQGl0kdM8'
 
 if(token) {
   jwt.verify(token, jwt_secret, (err, decoded)=> {
@@ -75,6 +75,11 @@ const render = () => {
               path="/mybookings"
               render={props => <MyBookingsPage {...props} />}
               component={MyBookingsPage}
+            />
+            <AuthRoute
+              path="/timeline"
+              render={props => <TimeLineViewPage {...props} />}
+              component={TimeLineViewPage}
             />
             <AuthRoute
               path="/booking-page"

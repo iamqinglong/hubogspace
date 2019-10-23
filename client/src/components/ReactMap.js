@@ -1,6 +1,6 @@
 import "mapbox-gl/dist/mapbox-gl.css";
 import "react-map-gl-geocoder/dist/mapbox-gl-geocoder.css";
-import React, { useState, useRef, useEffect,useCallback } from 'react'
+import React, { useState, useRef, } from 'react'
 import MapGL,{Marker} from "react-map-gl";
 import Geocoder from "react-map-gl-geocoder";
 import Pin from './Pin'

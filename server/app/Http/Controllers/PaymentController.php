@@ -30,10 +30,11 @@ class PaymentController extends Controller
 
             $status = [ (object)[
                 'key'=> 'paid',
-                'value' => 'Paid with Card',
+                'value' => 'Booked and Paid with Card ',
                 'charge_id' => $charge_id,
                 'date' => Carbon::parse(time())->setTimezone('Asia/Singapore')->toDateTimeString()
-            ]];
+            ],
+            ];
 
             $booking = Booking::create([
                 'expected_arrival' =>    Carbon::parse($request->expectedArrival)->setTimezone('Asia/Singapore')->toDateTimeString(),

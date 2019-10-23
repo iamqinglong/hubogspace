@@ -2,30 +2,37 @@ import React, {useState,useEffect, useMemo} from "react";
 import axios from 'axios'
 import cookie from 'js-cookie'
 import moment from 'moment'
-
 import StripeCheckout from 'react-stripe-checkout'
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { Link } from "react-router-dom";
+
+
 // reactstrap components
 import {
   Button,
   Modal,
   Container,
+  Input,
+  Row,
+  Col
 } from "reactstrap";
 
 // core components
 import "assets/css/hubogspace.css";
 import NavbarComponent from "components/Navbars/NavbarComponent";
 import DataTable from 'react-data-table-component'
+import AnimatedRater from "components/AnimatedRater";
 
 function MyBookingsPage() {
 
   const [mybookings, setMybookings] = useState([]);
   const token = cookie.get('token')
-
+  const [rate, setRate] = useState(0)
+  const [description, setDescription] = useState('')
   const [modalLive, setModalLive] = useState(false);
   const [selectedMethod, setSelectedMethod] = useState('');
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('cash');
+  // const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('cash');
   const [selectedRow, setSelectedRow] = useState('');
 
   const getMyBookings = async (id)=> {
@@ -39,7 +46,7 @@ function MyBookingsPage() {
     }
   }
 
-  const handleReview = async()=> {
+  const reviewAndRate = async()=> {
     console.log('clicked')
   }
 
@@ -133,13 +140,7 @@ function MyBookingsPage() {
         return row.statuses[row.statuses.length-1].value
       }
     },
-    {
-      
-      cell: (row) => <Button color={'neutral'} onClick={handleReview}>View</Button>,
-      ignoreRowClick: true,
-      allowOverflow: true,
-      button: true,
-    },
+    
     {
       
       cell: (row) => {
@@ -157,9 +158,27 @@ function MyBookingsPage() {
 
     {
       
+      cell: (row) => <Button color={'neutral'} to={{
+                        pathname: '/timeline',
+                        state: {
+                          statuses: row.statuses
+                        }
+                    }}
+                    tag={Link}>View</Button>,
+      ignoreRowClick: true,
+      allowOverflow: true,
+      button: true,
+    },
+
+    {
+      
       cell: (row) => {
                   if(row.statuses.some(status => status.key === 'paid'))
-                    return <Button  color={'neutral'} onClick={handleReview}>Write a Review</Button>},
+                    return <Button  color={'neutral'} onClick={() =>{
+                      setSelectedMethod('review')
+                      setModalLive(true)
+                      setSelectedRow(row)
+                    }}>Write a Review</Button>},
       ignoreRowClick: true,
       allowOverflow: true,
       button: true,
@@ -186,7 +205,11 @@ function MyBookingsPage() {
       <Modal toggle={() => setModalLive(false)} isOpen={modalLive}>
         <div className="modal-header">
         <h5 className="modal-title" id="exampleModalLiveLabel">
-            Pay with Stripe
+            { 
+              selectedMethod === 'pay' ? ('Pay with Stripe') : 
+              selectedMethod === 'review' ? 
+              ('Write a review and rate it') : ('')
+            }
           </h5>
           <button
             aria-label="Close"
@@ -199,7 +222,33 @@ function MyBookingsPage() {
         </div>
         <div className="modal-body">
            
-              <h5>Price: $ <b>{selectedRow && (selectedRow.space.price)}</b></h5>
+              
+            {
+              selectedMethod === 'pay' ? (<h5>Price: $ <b>{selectedRow && (selectedRow.space.price)}</b></h5>) : 
+              (
+                <>
+                  <Row className="justify-content-center">
+                  
+                      <div className="textarea-container">
+                        <Input
+                          cols="100"
+                          name="name"
+                          placeholder="Description"
+                          rows="4"
+                          type="textarea"
+                          // onChange={(e) => {handleOnChange(e,setDescription)}}
+                        ></Input>
+                      </div>
+                    
+                    <Row className="justify-content-center">
+                      <AnimatedRater className="justify-content-center"/>
+                   
+                    </Row>
+                  </Row>
+                </>
+                
+              )
+            }
 
         </div>
         <div className="modal-footer">
@@ -212,7 +261,7 @@ function MyBookingsPage() {
           </Button>
           
           {
-            selectedRow && (
+            selectedMethod === 'pay' ? (
               <StripeCheckout
                   stripeKey={'pk_test_XtHFdL6fP8UPdJCiWTN2ZmGc00gzVZ1ZxB'}
                   token={handleToken}
@@ -220,6 +269,14 @@ function MyBookingsPage() {
                   product={selectedRow}
                   currency={'USD'}
               />
+            ) : (
+              <Button
+                color="primary"
+                type="button"
+                onClick={reviewAndRate}
+              >
+                Rate Now
+              </Button>
             )
           }
               

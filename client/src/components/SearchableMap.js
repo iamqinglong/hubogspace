@@ -3,7 +3,6 @@ import MapGL, { Source, Layer,Marker, Popup } from '@urbica/react-map-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import axios from 'axios';
 import Pin from './Pin'
-import ControlPanel from 'components/ControlPanel'
 import SidebarPanel from 'components/SidebarPanel'
 
 const MAPBOX_TOKEN =

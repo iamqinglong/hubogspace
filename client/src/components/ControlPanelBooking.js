@@ -7,6 +7,7 @@ import StripeCheckout from 'react-stripe-checkout'
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import SignatureCanvas from 'react-signature-canvas'
+import { Link } from "react-router-dom";
 //components
 import { 
   Button, 
@@ -46,28 +47,17 @@ const ControlPanelBooking = (props) => {
         console.log(error)
       }
     }
-    else if(selectedMethod === 'checkIn'){
-      
+    else if(selectedMethod === 'checkIn' || selectedMethod === 'checkOut')
       setTrimmedDataURL( sigPad.getTrimmedCanvas().toDataURL('image/png') )
-     
-      // console.log(res.data)
-      // toast.success(res.data.message, {
-      //   position: "top-right",
-      //   autoClose: 5000,
-      //   hideProgressBar: false,
-      //   closeOnClick: true,
-      //   pauseOnHover: true,
-      //   draggable: true,
-      //   });
-        // setModalLive(false)
-    }
+    
+    
   }
 
   const handleSelectPaymentMethod =(e)=>{
     setSelectedPaymentMethod(e.target.value)
   }
-
-  const checkIn =async ()=> {
+  //either checkIn or checkOut
+  const sendCheckInOrCheckOut = async ()=> {
     try {
    
         
@@ -75,7 +65,7 @@ const ControlPanelBooking = (props) => {
         fd.append('signature',trimmedDataURL)
 
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-        const res = await axios.post(`http://localhost:8000/api/checkIn/${selectedRow.id}`,fd, { headers: {
+        const res = await axios.post(`http://localhost:8000/api/${selectedMethod}/${selectedRow.id}`,fd, { headers: {
           'Content-Type': 'multipart/form-data'
         }})
         
@@ -163,8 +153,11 @@ const ControlPanelBooking = (props) => {
   }, [selectedRow])
 
   useEffect(() => {
-    if(trimmedDataURL !== null)
-      checkIn()
+
+    if(trimmedDataURL !== null){
+      sendCheckInOrCheckOut()
+    }
+
   }, [trimmedDataURL])
   
   
@@ -231,6 +224,21 @@ const ControlPanelBooking = (props) => {
       allowOverflow: true,
       button: true,
     },
+    {
+      cell: (row) => <Button color="primary" size="md" 
+                      to={{
+                        pathname: '/timeline',
+                        state: {
+                          statuses: row.statuses
+                        }
+                    }}
+                    tag={Link}
+                    >View</Button>
+      ,
+      ignoreRowClick: true,
+      allowOverflow: true,
+      button: true,
+    },
   ], []);
 
   return (
@@ -290,7 +298,7 @@ const ControlPanelBooking = (props) => {
                   <h5>Price: $ <b>{spaceWithBookings[0].price}</b></h5>
                 </>
               ) : (
-                selectedMethod === 'checkIn' ? (
+                selectedMethod === 'checkIn' ||  selectedMethod === 'checkOut'? (
                   <>
                     <b className="text-center">Draw your Signature below</b>
                     <SignatureCanvas penColor='black'
@@ -298,7 +306,7 @@ const ControlPanelBooking = (props) => {
                     ref={(ref) => { setSigPad(ref) }}
                     canvasProps={{width: 450, height: 200, className: 'sigCanvas'}} />
                   </>
-                ):('CheckOut')
+                ):('')
               )
             }
         </div>

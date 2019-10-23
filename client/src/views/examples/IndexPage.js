@@ -3,17 +3,10 @@ import {Link} from 'react-router-dom'
 // reactstrap components
 import {
   Button,
-  Input,
-  InputGroupAddon,
-  InputGroupText,
-  InputGroup,
   Container,
-  Row,
   Col,
   Card,
-  CardHeader,
   CardBody,
-  CardFooter,
   Nav
 } from "reactstrap";
 

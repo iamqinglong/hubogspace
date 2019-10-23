@@ -70,12 +70,7 @@ class BookingController extends Controller
 
     public function checkIn(Booking $booking) {
 
-        $image = request('signature');  // your base64 encoded
-        $image = str_replace('data:image/png;base64,', '', $image);
-        $image = str_replace(' ', '+', $image);
-        $imageName = Uuid::generate(4)->string . '.png';
-
-        Storage::disk('local')->put($imageName, base64_decode($image));
+        $imageName = $this->saveImage(request());
         
         $status = (object) [
             'key'=> 'checkIn',
@@ -96,5 +91,42 @@ class BookingController extends Controller
             'booking' => $retrieveBooking,
             'state' => true
         ]);
+    }
+
+    public function checkOut(Booking $booking){
+       
+        $imageName = $this->saveImage(request());
+
+        $status = (object) [
+            'key'=> 'checkOut',
+            'value' => 'Checked-out',
+            'image' => $imageName,
+            'date' => Carbon::parse(time())->setTimezone('Asia/Singapore')->toDateTimeString()
+        ];
+
+        $data = $booking->statuses;
+        array_push($data,$status);
+        $booking->statuses = $data;
+        $booking->save();
+
+        $retrieveBooking = Booking::where('id',$booking->id)->with('user')->get();
+
+        return response()->json([
+            'message' => 'Checkeed-out successful, Thank you!',
+            'booking' => $retrieveBooking,
+            'state' => true
+        ]);
+    }
+
+    public function saveImage(){
+
+        $image = request('signature');  // your base64 encoded
+        $image = str_replace('data:image/png;base64,', '', $image);
+        $image = str_replace(' ', '+', $image);
+        $imageName = Uuid::generate(4)->string . '.png';
+
+        Storage::disk('local')->put($imageName, base64_decode($image));
+
+        return $imageName;
     }
 }

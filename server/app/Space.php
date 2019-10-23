@@ -7,6 +7,7 @@ use App\Payment;
 use App\Image;
 use App\User;
 use App\Booking;
+use App\Review;
 
 class Space extends Model
 {
@@ -29,5 +30,10 @@ class Space extends Model
     public function bookings()
     {
         return $this->hasMany(Booking::class)->orderBy('created_at','DESC');;
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class)->orderBy('created_at','DESC');;
     }
 }

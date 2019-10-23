@@ -3,14 +3,7 @@ import axios from 'axios'
 import cookie from 'js-cookie'
 // reactstrap components
 import {
-  Button,
-  Input,
-  InputGroupAddon,
-  InputGroupText,
-  InputGroup,
   Container,
-  Row,
-  Col
 } from "reactstrap";
 
 // core components

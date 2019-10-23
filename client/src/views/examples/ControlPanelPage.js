@@ -42,18 +42,8 @@ function ControlPanelPage() {
     const [description, setDescription] = useState('')
     const [address, setAddress] = useState('')
     const [pictures, setPictures] = useState([])
-    const [geolocation, setGeolocation] = useState({longitude: 0, latitude: 0})
-    const [uploadPercentage, setUploadPercentage] = useState(0);
     const [space, setSpace] = useState({})
     const [edit, setEdit] = useState(false)
-    const [viewport, setViewport] = useState({
-        latitude: 8.482374,
-        longitude: 124.642375,
-        zoom: 12,
-        width: '650px',
-        height: '400px'
-      })
-    const [marker, setMarker] = useState({latitude: 8.482374,longitude: 124.642375})
 
     useEffect(() => {
         document.body.classList.add("landing-page");
@@ -211,7 +201,6 @@ function ControlPanelPage() {
                                             zoom={15}
                                             width={'650px'}
                                             height={'400px'}
-                                            // onViewportChange={(viewport) => setViewport(viewport)}
                                             mapboxApiAccessToken={MAPBOX_TOKEN} 
                                             mapStyle={'mapbox://styles/mapbox/streets-v11'}>
                                                 
