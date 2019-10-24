@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import axios from 'axios'
 import {useDispatch} from 'react-redux'
-import {setLogout} from 'store/actions/index'
+import {setLogout,setLogin} from 'store/actions/index'
 import cookie from 'js-cookie'
 // reactstrap components
 import {
@@ -85,9 +85,31 @@ function NavbarComponent(props) {
   }
 
   useEffect(() =>{
-    console.log('navbar')
-  },[])
+    if(token){
+      getMe()
+      console.log('chat')
+      window.Echo.private(`chat`)
+        .here((users) => {
+            console.log(users)
+        })
+        .joining((user) => {
+            console.log(user.name);
+        })
+        .leaving((user) => {
+            console.log(user.name);
+    });
 
+    }
+  },[])
+  const getMe = async () => {
+    try {
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      const res = await axios.post('http://localhost:8000/api/auth/me')
+      dispatch(setLogin(res.data))
+    } catch (error) {
+      console.log(error)
+    }
+  }
   return (
     <>
       {collapseOpen ? (

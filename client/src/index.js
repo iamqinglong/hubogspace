@@ -1,23 +1,8 @@
-/*
 
-=========================================================
-* Now UI Kit React - v1.0.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/now-ui-kit-react
-* Copyright 2019 Creative Tim (http://www.creative-tim.com)
-* Licensed under MIT (https://github.com/creativetimofficial/now-ui-kit-react/blob/master/LICENSE.md)
-
-* Designed by www.invisionapp.com Coded by www.creative-tim.com
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
 import React from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
+import Echo from "laravel-echo"
 
 // styles for this kit
 import "assets/css/bootstrap.min.css";
@@ -45,8 +30,8 @@ import ControlPanelPage from "views/examples/ControlPanelPage";
 import FinalSetupPage from "views/examples/FinalSetupPage";
 import TimeLineViewPage from "views/examples/TimeLineViewPage";
 let token = cookie.get('token')
-const jwt_secret = 'kxDqLhykHZrLUVUiy3gZHF2hu2Pst87l6UaWglrsfBks3KgOBDolqsbhl9x2kpR9'
-
+const jwt_secret = 'kJmj3ixbt8go4WAcLETzwAVdrHa2lERuS2CI7G7kQI3I5bAM187n0vkINC06jq99'
+window.Pusher = require('pusher-js');
 if(token) {
   jwt.verify(token, jwt_secret, (err, decoded)=> {
     if(err) {
@@ -148,8 +133,21 @@ if(token)
       store.dispatch({type: "SET_LOGIN", payload: res.data})
       render()
     })
-
-}
+    
+    window.Echo = new Echo({
+        broadcaster: 'pusher',
+        key: 'anyKey',
+        wsHost: window.location.hostname,
+        wsPort: 6001,
+        disableStats: true,
+      //   authEndpoint : 'http://127.0.0.1:8000/broadcasting/auth',
+      //   auth: {
+      //     headers: {
+      //         Authorization: 'Bearer ' + token,
+      //     }
+      // },
+    });
+    }
 else {
   render()
 }
