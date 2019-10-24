@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Uuid;
+use App\Services\Stripe\Transaction;
 
 class BookingController extends Controller
 {
@@ -30,8 +31,30 @@ class BookingController extends Controller
         ]);
 
     }
+
+    public static function checkIfBooked (Request $request){
+
+        $booking = Booking::where('space_id', $request->space['id'])
+                            ->where('expected_arrival',Carbon::parse($request->expectedArrival)->setTimezone('Asia/Singapore')->toDateString())
+                            ->whereRaw('JSON_CONTAINS(statuses, \'{"key": "paid"}\')')
+                            ->whereRaw('not JSON_CONTAINS(statuses, \'{"key": "cancel"}\')')
+                            ->first();
+
+        return $booking;
+    }
+
     public function book(Request $request) 
     {
+       
+        $booking = $this->checkIfBooked($request);
+
+        if($booking){
+            return response()->json([
+                'message' => 'There is currently booking, Choose another date',
+                'state' => false
+            ],422); 
+        }
+
         $status = [ (object)[
             'key'=> 'book',
             'value' => 'Just Booked',
@@ -48,7 +71,7 @@ class BookingController extends Controller
         
         return response()->json([
             'message' => 'Book successful, Thank you!',
-            'booking' => $booking,
+            'booking' => $bookings,
             'state' => true
         ]); 
 
@@ -132,11 +155,60 @@ class BookingController extends Controller
 
     public function bookerCancelBooking(Booking $booking){
 
-        return response()->json([
-            'message' => 'Cancel Booking and refunded, Thank you!',
-            'booking' => $booking,
-            'state' => true
-        ]);
+        $expected_arrival = Carbon::parse($booking->expected_arrival);
+        
+        if(Carbon::now()->lessThan($expected_arrival->addHour(1)) ) {
+           
+            $index = $this->searchArrayOfObject('paid',$booking->statuses);
+
+            if( is_numeric($index) && !$this->searchArrayOfObject('checkIn',$booking->statuses) ){
+
+                $transact = Transaction::refund($booking->statuses[$index]['charge_id'],$booking->statuses[$index]['transfer_id']);
+
+                $status = (object) [
+                    'key'=> 'cancel',
+                    'value' => 'Successfully cancelled and refunded',
+                    'reverse_id' => $transact['transfer']['id'],
+                    'refund' => $transact['refund']['id'],
+                    'date' => Carbon::parse(time())->setTimezone('Asia/Singapore')->toDateTimeString()
+                ];
+
+                $data = $booking->statuses;
+                array_push($data,$status);
+                $booking->statuses = $data;
+                $booking->save();
+
+                $newBooking = Booking::where('id',$booking->id)->with('space.payments')->get();
+                
+                return response()->json([
+                    'message' => 'Cancel Booking and refunded, Thank you!',
+                    'booking' => $newBooking,
+                    'state' => true
+                ]);
+
+            }
+
+        }else{
+            return response()->json([
+                'message' => 'not less than',
+                'booking' => $booking,
+                'state' => false
+            ]);
+        }
+            
+    }
+
+    public function searchArrayOfObject($value, $arrayObject){
+        
+        $key = null;
+        $key = array_search($value, array_column($arrayObject, 'key'));
+        if(is_numeric($key)){
+            return $key;
+        }
+            
+        
+        return false;
+        
         
     }
 }

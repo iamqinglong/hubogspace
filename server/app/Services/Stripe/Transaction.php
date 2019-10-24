@@ -6,7 +6,7 @@ use App\User;
 use Stripe\Charge;
 use Stripe\Stripe;
 use Stripe\Transfer;
-use Stripe\Payout;
+use Stripe\Refund;
 class Transaction
 {
     public static function create(User $user, $token_id, $price)
@@ -30,9 +30,28 @@ class Transaction
             'destination' => $user->stripe_connect_id
         ]);
         
-        return $charge->id;
+        return [
+            'charge_id' => $charge->id,
+            'transfer_id' => $transfer->id
+        ];
     }
     
+    public static function refund($charge_id,$transfer_id)
+    {
+
+        Stripe::setApiKey(config('services.stripe.secret'));
+
+        $transfer = Transfer::createReversal($transfer_id);
+
+        $refund = Refund::create([
+            "charge" => $charge_id,
+          ]);
+        
+        return [
+            'refund' => $refund,
+            'transfer' => $transfer
+        ];
+    }
     public static function toStripeFormat(float $price)
     {
         return $price * 100;
