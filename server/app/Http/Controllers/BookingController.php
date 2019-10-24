@@ -129,4 +129,14 @@ class BookingController extends Controller
 
         return $imageName;
     }
+
+    public function bookerCancelBooking(Booking $booking){
+
+        return response()->json([
+            'message' => 'Cancel Booking and refunded, Thank you!',
+            'booking' => $booking,
+            'state' => true
+        ]);
+        
+    }
 }
