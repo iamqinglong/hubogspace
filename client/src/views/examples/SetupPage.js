@@ -143,7 +143,7 @@ function SetupPage(props) {
         <div className="section section-contact-us text-center">
           <Container>
             <h2 className="title">Have a space for rent ? Setup now!</h2>
-            <Row>
+            <Row className="justify-content-center">
               <Form>
               <Col className="text-center ml-auto mr-auto" lg="8" md="8">
                 <InputGroup className={nameFocus ? "input-group-focus" : ""}>

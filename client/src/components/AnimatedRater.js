@@ -24,7 +24,7 @@ Star.propTypes = {
 }
 
 export default class AnimatedRater extends Component {
-  constructor() {
+  constructor(props) {
     super()
     this.state = {
       shouldStart: false,
@@ -56,6 +56,7 @@ export default class AnimatedRater extends Component {
       rating,
       defaultStyles
     })
+    this.props.setRate(rating)
   }
   getStyle(prevInterpolatedStyles) {
     const { shouldStart, rating } = this.state

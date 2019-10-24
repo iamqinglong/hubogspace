@@ -1,6 +1,7 @@
 import React,{useState,useEffect} from "react";
 import { Timeline, TimelineItem }  from 'vertical-timeline-component-for-react';
 import moment from 'moment'
+import Rater from 'react-rater'
 // reactstrap components
 import {
   Container,
@@ -39,7 +40,17 @@ function TimeLineViewPage(props) {
                                 }}
                         >
                             <h3>{status.value}</h3>
-                            
+                            {
+                              status.description && (
+                                <>
+                                    <h5>Description</h5>
+                                    <br/>
+                                    <b>{status.description}</b>
+                                    <br/>
+                                    <Rater total={5} rating={status.rate} interactive={false}/>
+                                </>
+                                )
+                            }
                             {
                                 status.image && (
                                 <>

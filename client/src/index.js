@@ -45,7 +45,7 @@ import ControlPanelPage from "views/examples/ControlPanelPage";
 import FinalSetupPage from "views/examples/FinalSetupPage";
 import TimeLineViewPage from "views/examples/TimeLineViewPage";
 let token = cookie.get('token')
-const jwt_secret = 'nV3InvsPKnx006fMMdLgWcdeLPiG7BJcBD6SAIfWoLE5HejQK3ajVY4fQGl0kdM8'
+const jwt_secret = 'kxDqLhykHZrLUVUiy3gZHF2hu2Pst87l6UaWglrsfBks3KgOBDolqsbhl9x2kpR9'
 
 if(token) {
   jwt.verify(token, jwt_secret, (err, decoded)=> {

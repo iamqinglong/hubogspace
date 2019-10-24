@@ -61,7 +61,8 @@ const BookingPage =(props)=> {
       
       console.log(res.data)
     } catch (error) {
-      console.log(error)
+      if(error.response.status !== undefined && error.response.status === 422)
+        setWarning(error.response.data.message)
     }
 
   }
@@ -106,6 +107,7 @@ const BookingPage =(props)=> {
       axios.defaults.headers.common['Authorization'] = `Bearer ${cookie.get('token')}`;
       const space = props.location.state.space
       const res = await axios.post(`http://localhost:8000/api/book`,{space,expectedArrival})
+      console.log(res.data)
       if(res.data.state)
       {
         toast.success(res.data.message, {
@@ -119,7 +121,8 @@ const BookingPage =(props)=> {
           props.history.push('/mybookings')
       }
     } catch (error) {
-      console.log(error)
+      if(error.response.status !== undefined && error.response.status === 422)
+        setWarning(error.response.data.message)
     }
   }
   useEffect(() => {

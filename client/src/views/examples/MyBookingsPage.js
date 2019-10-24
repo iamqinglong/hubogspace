@@ -7,7 +7,6 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Link } from "react-router-dom";
 
-
 // reactstrap components
 import {
   Button,
@@ -27,6 +26,7 @@ import AnimatedRater from "components/AnimatedRater";
 function MyBookingsPage() {
 
   const [mybookings, setMybookings] = useState([]);
+  const [errors, setErrors] = useState(null);
   const token = cookie.get('token')
   const [rate, setRate] = useState(0)
   const [description, setDescription] = useState('')
@@ -39,7 +39,6 @@ function MyBookingsPage() {
     try {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       const res = await axios.get(`http://localhost:8000/api/getMyBookings`)
-      console.log(res.data)
       setMybookings(res.data.bookings)
     } catch (error) {
       console.log(error)
@@ -47,9 +46,59 @@ function MyBookingsPage() {
   }
 
   const reviewAndRate = async()=> {
-    console.log('clicked')
+    try {
+      console.log(rate)
+      console.log(description)
+      axios.defaults.headers.common['Authorization'] = `Bearer ${cookie.get('token')}`;
+      const res = await axios.post(`http://localhost:8000/api/reviewAndRate/${selectedRow.id}`,{rate,description})
+      if(res.data.state){
+        toast.success(res.data.message, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          });
+          
+          updateBookings(res.data.booking[0])
+          
+      }
+      setModalLive(false)
+    } catch (error) {
+      if(error.response.status !== undefined && error.response.status === 422)
+          setErrors(error.response.data.errors)
+    }
   }
 
+  const handleCancelBooking = async()=> {
+    try {
+      axios.defaults.headers.common['Authorization'] = `Bearer ${cookie.get('token')}`;
+      const res = await axios.post(`http://localhost:8000/api/bookerCancelBooking/${selectedRow.id}`)
+     
+      if(res.data.state){
+
+        toast.success(res.data.message, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          });
+
+          console.log(res.data.booking[0])
+          updateBookings(res.data.booking[0])
+      }
+    } catch (error) {
+      if(error.response.status !== undefined && error.response.status === 422)
+          setErrors(error.response.data.errors)
+    }
+  }
+
+  const handleOnChange = async (e,setter) => {
+      setter(e.target.value)
+  }
   const handleToken = async(token,addresses)=>{
     console.log(token,addresses)
     try {
@@ -89,14 +138,8 @@ function MyBookingsPage() {
   }
 
   const updateBookings = (data) => {
-    console.log(data)
-    let newData = [...mybookings];
-    console.log(newData)
-    let bookings = newData.map(booking => (booking.id === data.id ? {...data} : booking) )
-    console.log(bookings)
-    newData = [...bookings]
-    console.log(newData)
-    setMybookings([...newData])
+    let bookings = mybookings.map(booking => (booking.id === data.id ? {...data} : booking) )
+    setMybookings([...bookings])
   }
 
   useEffect(() => {
@@ -104,8 +147,9 @@ function MyBookingsPage() {
   }, [])
 
   useEffect(() => {
-    console.log(selectedRow)
-  }, [selectedRow])
+    if(mybookings.length > 0)
+      console.log(mybookings)
+  }, [mybookings])
  
   useEffect(() => {
     // document.body.classList.add("landing-page");
@@ -144,7 +188,7 @@ function MyBookingsPage() {
     {
       
       cell: (row) => {
-        if(row.space.payments.some(status => status.name === 'Card') && !row.statuses.some(status => status.key === 'paid'))
+        if(row.space.payments.some(status => status.name === 'Card') && !row.statuses.some(status => status.key === 'paid') && moment().isBefore(moment(row.expected_arrival).subtract(1, 'hours')) )
             return <Button color={'neutral'} onClick={()=>{
               setModalLive(true)
               setSelectedMethod('pay')
@@ -173,7 +217,7 @@ function MyBookingsPage() {
     {
       
       cell: (row) => {
-                  if(row.statuses.some(status => status.key === 'paid'))
+                  if(row.statuses.some(status => status.key === 'paid') && !row.statuses.some(status => status.key === 'reviewed'))
                     return <Button  color={'neutral'} onClick={() =>{
                       setSelectedMethod('review')
                       setModalLive(true)
@@ -182,6 +226,27 @@ function MyBookingsPage() {
       ignoreRowClick: true,
       allowOverflow: true,
       button: true,
+
+    },
+    {
+      
+      cell: (row) => {
+                  if( !row.statuses.some(status => status.key === 'cancel') &&
+                      ( moment().isBefore(moment(row.expected_arrival).subtract(1, 'hours')) 
+                        || (row.statuses.some(status => status.key === 'paid') && !row.statuses.some(status => status.key === 'checkIn') && moment().isBefore(moment(row.expected_arrival).subtract(1, 'hours')) )
+                        || ((row.statuses.length <= 1) && moment().isBefore(moment(row.expected_arrival).subtract(1, 'hours')))
+                      )
+                    )
+                    return <Button  color={'neutral'} onClick={() =>{
+                      setSelectedMethod('cancel')
+                      setModalLive(true)
+                      setSelectedRow(row)
+                    }}>Cancel</Button>},
+
+      ignoreRowClick: true,
+      allowOverflow: true,
+      button: true,
+      
     },
   ], []);
   return (
@@ -208,7 +273,9 @@ function MyBookingsPage() {
             { 
               selectedMethod === 'pay' ? ('Pay with Stripe') : 
               selectedMethod === 'review' ? 
-              ('Write a review and rate it') : ('')
+              ('Write a review and rate it') : selectedMethod === 'cancel' ?
+              ('Are you sure ?'): ('')
+              
             }
           </h5>
           <button
@@ -224,30 +291,51 @@ function MyBookingsPage() {
            
               
             {
-              selectedMethod === 'pay' ? (<h5>Price: $ <b>{selectedRow && (selectedRow.space.price)}</b></h5>) : 
+              selectedMethod === 'pay' ? 
+              (<h5>Price: $ <b>{selectedRow && (selectedRow.space.price)}</b></h5>) : 
               (
-                <>
-                  <Row className="justify-content-center">
-                  
-                      <div className="textarea-container">
-                        <Input
-                          cols="100"
-                          name="name"
-                          placeholder="Description"
-                          rows="4"
-                          type="textarea"
-                          // onChange={(e) => {handleOnChange(e,setDescription)}}
-                        ></Input>
-                      </div>
-                    
+                 selectedMethod === 'review' ? (
+                  <>
+                  {
+                      errors !== null && errors.description  ? (
+  
+                         errors.description.map((error,index) => <Row className="justify-content-center" key={index}><b style={{color:'red'}}>{error}</b></Row>)
+                         
+                        ) : ('')
+                     
+                  }
+                  {
+                     errors !== null && errors.rate ? (
+                      errors.rate.map((error,index) => <Row className="justify-content-center" key={index}><b style={{color:'red'}}>{error}</b></Row>)
+                      ) : ('')
+                  }
                     <Row className="justify-content-center">
-                      <AnimatedRater className="justify-content-center"/>
-                   
+                    
+                        <div className="textarea-container">
+                          <Input
+                            cols="100"
+                            name="name"
+                            placeholder="Write your review here"
+                            rows="4"
+                            type="textarea"
+                            onChange={(e) => {handleOnChange(e,setDescription)}}
+                          ></Input>
+                        </div>
+                      
+                      <Row className="justify-content-center">
+                        <AnimatedRater setRate={setRate} className="justify-content-center"/>
+                     
+                      </Row>
                     </Row>
-                  </Row>
-                </>
-                
+                  </>
+                 ): (
+                   selectedMethod === 'cancel' ? (
+                     'You sure you want to cancel this booking ?'
+                   ): ('')
+                 )
+               
               )
+              
             }
 
         </div>
@@ -255,7 +343,12 @@ function MyBookingsPage() {
           <Button
             color="secondary"
             type="button"
-            onClick={() => setModalLive(false)}
+            onClick={() => {
+              setModalLive(false)
+              setSelectedRow('')
+              setSelectedMethod('')
+              setErrors(null)
+            }}
           >
             Close
           </Button>
@@ -270,13 +363,26 @@ function MyBookingsPage() {
                   currency={'USD'}
               />
             ) : (
-              <Button
-                color="primary"
-                type="button"
-                onClick={reviewAndRate}
-              >
-                Rate Now
-              </Button>
+              selectedMethod === 'review' ? (
+                  <Button
+                  color="primary"
+                  type="button"
+                  onClick={reviewAndRate}
+                >
+                  Rate Now
+                </Button>
+              ) : (
+                selectedMethod === 'cancel' ? (
+                  <Button
+                  color="primary"
+                  type="button"
+                  onClick={handleCancelBooking}
+                >
+                  Cancel Booked
+                </Button>
+                ) : ('')
+              )
+              
             )
           }
               
