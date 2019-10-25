@@ -22,10 +22,10 @@ class PaymentController extends Controller
     }
     public function bookAndPayStripe(Request $request)
     {
-        try {
+        // try {
             
-            $booking = BookingController::checkIfBooked($request);
-            if($booking){
+            $resBooking = BookingController::checkIfBooked($request->space['id'],$request->expectedArrival);
+            if($resBooking){
                 return response()->json([
                     'message' => 'There is currently booking, Choose another date',
                     'state' => false
@@ -61,15 +61,23 @@ class PaymentController extends Controller
                 'state' => true
             ]); 
 
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'There were some issue with the payment. Please try again later.',
-                'state' => false
-            ]);
-        }
+        // } catch (\Exception $e) {
+        //     return response()->json([
+        //         'message' => 'There were some issue with the payment. Please try again later.',
+        //         'state' => false
+        //     ]);
+        // }
        
     }
     public function payInCash(Booking $booking){
+        
+        $resBooking = BookingController::checkIfBooked($booking->space_id,$booking->expected_arrival);
+        if($resBooking){
+            return response()->json([
+                'message' => 'The booked date, already paid by another user.',
+                'state' => false
+            ],422);
+        }
         
         $status = (object) [
             'key'=> 'paid',
@@ -96,7 +104,13 @@ class PaymentController extends Controller
 
         try {
 
-           
+            $resBooking = BookingController::checkIfBooked($booking->space_id,$booking->expected_arrival);
+            if($resBooking){
+                return response()->json([
+                    'message' => 'The booked date, already paid by another user.',
+                    'state' => false
+                ],422);
+            }
             $this->payWithStripeHelper(auth()->user(), $booking,request()->token['id'],$booking->space->price);
 
             $data = Booking::where('id',$booking->id)->with('user')->get();
@@ -119,6 +133,13 @@ class PaymentController extends Controller
     public function bookerPayWithStripe(Booking $booking){
 
         try {
+            $resBooking = BookingController::checkIfBooked($booking->space_id,$booking->expected_arrival);
+            if($resBooking){
+                return response()->json([
+                    'message' => 'The booked date, already paid by another user.',
+                    'state' => false
+                ],422);
+            }
             $user = User::find($booking->space->user_id);
             $this->payWithStripeHelper($user,$booking, request()->token['id'], $booking->space->price);
 

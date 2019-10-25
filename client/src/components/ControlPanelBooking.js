@@ -44,12 +44,56 @@ const ControlPanelBooking = (props) => {
           updateBookings(res.data.data[0])
           setModalLive(false)
       } catch (error) {
-        console.log(error)
+        if(error.response.status !== undefined && error.response.status === 422)
+        {
+          toast.warn(error.response.data.message, {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            });
+        }
       }
     }
     else if(selectedMethod === 'checkIn' || selectedMethod === 'checkOut')
       setTrimmedDataURL( sigPad.getTrimmedCanvas().toDataURL('image/png') )
-    
+    else if(selectedMethod === 'cancel'){
+      try {
+        console.log(selectedRow)
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        const res = await axios.post(`http://localhost:8000/api/lessorCancelBooking/${selectedRow.id}`)
+        console.log(res.data)
+        if(res.data.state){
+  
+          toast.success(res.data.message, {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            });
+  
+            console.log(res.data.booking[0])
+            updateBookings(res.data.booking[0])
+            setModalLive(false)
+        }
+      } catch (error) {
+        if(error.response.status !== undefined && error.response.status === 422)
+        {
+          toast.warn(error.response.data.message, {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            });
+        }
+      }
+    }
     
   }
 
@@ -91,7 +135,7 @@ const ControlPanelBooking = (props) => {
     try {
       axios.defaults.headers.common['Authorization'] = `Bearer ${cookie.get('token')}`;
       
-      const res = await axios.post(`http://localhost:8000/api/payWithStripe/${selectedRow.id}`,{token})
+      const res = await axios.post(`http://localhost:8000/api/lessorCancelBooking/${selectedRow.id}`,{token})
       if(res.data.state){
         toast.success(res.data.message, {
           position: "top-right",
@@ -119,7 +163,17 @@ const ControlPanelBooking = (props) => {
       
       // console.log(res.data)
     } catch (error) {
-      console.log(error)
+      if(error.response.status !== undefined && error.response.status === 422)
+      {
+        toast.warn(error.response.data.message, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          });
+      }
     }
 
   }
@@ -187,7 +241,10 @@ const ControlPanelBooking = (props) => {
     },
     {
       cell: (row) => {
-        if(!row.statuses.some(status => status.key === 'paid'))
+        if(!row.statuses.some(status => status.key === 'paid')
+        && !row.statuses.some(status => status.key === 'paid') 
+        && moment().isBefore(moment(row.expected_arrival).subtract(1, 'hours')) 
+        && !row.statuses.some(status => status.key === 'cancel'))
           return <Button color="primary" size="md" type="button" onClick={()=>{
             setModalLive(true)
             setSelectedMethod('pay')
@@ -200,7 +257,7 @@ const ControlPanelBooking = (props) => {
     },
     {
       cell: (row) => {
-        if(row.statuses.some(status => status.key === 'paid') && !row.statuses.some(status => status.key === 'checkIn'))
+        if(row.statuses.some(status => status.key === 'paid') && !row.statuses.some(status => status.key === 'checkIn') && !row.statuses.some(status => status.key === 'cancel'))
           return <Button color="primary" size="md" type="button" onClick={()=>{
             setModalLive(true)
             setSelectedMethod('checkIn')
@@ -213,7 +270,7 @@ const ControlPanelBooking = (props) => {
     },
     {
       cell: (row) => {
-        if(row.statuses.some(status => status.key === 'paid') && !row.statuses.some(status => status.key === 'checkOut'))
+        if(row.statuses.some(status => status.key === 'paid') && !row.statuses.some(status => status.key === 'checkOut') && !row.statuses.some(status => status.key === 'cancel'))
           return <Button color="primary" size="md" type="button" onClick={()=>{
             setModalLive(true)
             setSelectedMethod('checkOut')
@@ -223,6 +280,26 @@ const ControlPanelBooking = (props) => {
       ignoreRowClick: true,
       allowOverflow: true,
       button: true,
+    },
+    {
+      
+      cell: (row) => {
+                  if( !row.statuses.some(status => status.key === 'cancel') &&
+                      ( moment().isBefore(moment(row.expected_arrival).subtract(1, 'hours')) 
+                        || (row.statuses.some(status => status.key === 'paid') && !row.statuses.some(status => status.key === 'checkIn') && moment().isBefore(moment(row.expected_arrival).subtract(1, 'hours')) )
+                        || ((row.statuses.length <= 1) && moment().isBefore(moment(row.expected_arrival).subtract(1, 'hours')))
+                      )
+                    )
+                    return <Button  color="primary" size="md" onClick={() =>{
+                      setSelectedMethod('cancel')
+                      setModalLive(true)
+                      setSelectedRow(row)
+                    }}>Cancel</Button>},
+
+      ignoreRowClick: true,
+      allowOverflow: true,
+      button: true,
+      
     },
     {
       cell: (row) => <Button color="primary" size="md" 
@@ -263,7 +340,11 @@ const ControlPanelBooking = (props) => {
         <h5 className="modal-title" id="exampleModalLiveLabel">
           {
             selectedMethod === 'pay' ? ('Payment') : (
-              selectedMethod === 'checkIn' ? ('Check-in') : ('Check-Out')
+              selectedMethod === 'checkIn' ? ('Check-in') : (
+                selectedMethod === 'checkOut' ? ('Check-out') : (
+                  selectedMethod === 'cancel' ? ('Are you sure ?') : ('')
+                )
+              )
             )
           }
           </h5>
@@ -306,7 +387,11 @@ const ControlPanelBooking = (props) => {
                     ref={(ref) => { setSigPad(ref) }}
                     canvasProps={{width: 450, height: 200, className: 'sigCanvas'}} />
                   </>
-                ):('')
+                ):(
+                  selectedMethod === 'cancel' ? (
+                    'You sure you want to cancel this booking ?'
+                  ) : ('')
+                )
               )
             }
         </div>
@@ -333,7 +418,13 @@ const ControlPanelBooking = (props) => {
                   selectedMethod === 'pay' 
                   ? ('Pay') : (
                     selectedMethod === 'checkIn'
-                  ) ? ('Check-in'):('Check-out')
+                  ) ? ('Check-in'):(
+                    selectedMethod === 'checkOut' ? (
+                      'Check-out'
+                    ) : (
+                      selectedMethod === 'cancel' ? ('Cancel Booking') : ('')
+                    )
+                  )
                 }
               </Button>
             ) : (

@@ -89,6 +89,7 @@ function MyBookingsPage() {
 
           console.log(res.data.booking[0])
           updateBookings(res.data.booking[0])
+          setModalLive(false)
       }
     } catch (error) {
       if(error.response.status !== undefined && error.response.status === 422)
@@ -132,7 +133,17 @@ function MyBookingsPage() {
       
       console.log(res.data)
     } catch (error) {
-      console.log(error)
+      if(error.response.status !== undefined && error.response.status === 422)
+      {
+        toast.warn(error.response.data.message, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          });
+      }
     }
 
   }
@@ -188,7 +199,10 @@ function MyBookingsPage() {
     {
       
       cell: (row) => {
-        if(row.space.payments.some(status => status.name === 'Card') && !row.statuses.some(status => status.key === 'paid') && moment().isBefore(moment(row.expected_arrival).subtract(1, 'hours')) )
+        if(row.space.payments.some(status => status.name === 'Card') 
+        && !row.statuses.some(status => status.key === 'paid') 
+        && moment().isBefore(moment(row.expected_arrival).subtract(1, 'hours')) 
+        && !row.statuses.some(status => status.key === 'cancel'))
             return <Button color={'neutral'} onClick={()=>{
               setModalLive(true)
               setSelectedMethod('pay')
@@ -233,8 +247,8 @@ function MyBookingsPage() {
       cell: (row) => {
                   if( !row.statuses.some(status => status.key === 'cancel') &&
                       ( moment().isBefore(moment(row.expected_arrival).subtract(1, 'hours')) 
-                        || (row.statuses.some(status => status.key === 'paid') && !row.statuses.some(status => status.key === 'checkIn') && moment().isBefore(moment(row.expected_arrival).subtract(1, 'hours')) )
-                        || ((row.statuses.length <= 1) && moment().isBefore(moment(row.expected_arrival).subtract(1, 'hours')))
+                        // || (row.statuses.some(status => status.key === 'paid') && !row.statuses.some(status => status.key === 'checkIn') && moment().isBefore(moment(row.expected_arrival).subtract(1, 'hours')) )
+                        // || ((row.statuses.length <= 1) && moment().isBefore(moment(row.expected_arrival).subtract(1, 'hours')))
                       )
                     )
                     return <Button  color={'neutral'} onClick={() =>{

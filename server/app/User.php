@@ -86,4 +86,8 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(Review::class)->orderBy('created_at','DESC');;
     }
     
+    public function receivesBroadcastNotificationsOn()
+    {
+        return 'App.User.' . $this->id;
+    }
 }

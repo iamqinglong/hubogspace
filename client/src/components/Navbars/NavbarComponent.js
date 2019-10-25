@@ -5,6 +5,7 @@ import axios from 'axios'
 import {useDispatch} from 'react-redux'
 import {setLogout,setLogin} from 'store/actions/index'
 import cookie from 'js-cookie'
+import Echo from 'laravel-echo'
 // reactstrap components
 import {
   Collapse,
@@ -20,6 +21,7 @@ import {
   Container,
   UncontrolledTooltip
 } from "reactstrap";
+import Notification from "components/Notification";
 
 function NavbarComponent(props) {
 
@@ -87,17 +89,17 @@ function NavbarComponent(props) {
   useEffect(() =>{
     if(token){
       getMe()
-      console.log('chat')
-      window.Echo.private(`chat`)
-        .here((users) => {
-            console.log(users)
-        })
-        .joining((user) => {
-            console.log(user.name);
-        })
-        .leaving((user) => {
-            console.log(user.name);
-    });
+      // console.log('chat')
+      // window.Echo.join(`chat`)
+      //   .here((users) => {
+      //       console.log(users)
+      //   })
+      //   .joining((user) => {
+      //       console.log(user.name);
+      //   })
+      //   .leaving((user) => {
+      //       console.log(user.name);
+      //   });
 
     }
   },[])
@@ -127,15 +129,10 @@ function NavbarComponent(props) {
             <NavbarBrand
               to="/index"
               tag={Link}
-              // target="_blank"
-              // id="navbar-brand"
 
             >
               HubogSpace
             </NavbarBrand>
-            {/* <UncontrolledTooltip target="#navbar-brand">
-              Home
-            </UncontrolledTooltip> */}
             <button
               className="navbar-toggler navbar-toggler"
               onClick={() => {
@@ -157,60 +154,63 @@ function NavbarComponent(props) {
           >
             <Nav navbar>
               {
-                loggedIn ? (<UncontrolledDropdown nav>
-                  <DropdownToggle
-                    caret
-                    color="default"
-                    href="#pablo"
-                    nav
-                    onClick={e => e.preventDefault()}
-                  >
-                    <i className="now-ui-icons users_single-02"></i>
-                    <p>{user.last_name}</p>
-                  </DropdownToggle>
-                  <DropdownMenu>
-                    {
-                      (user.role === 'lessor') ? (
-                        (user.space_name) ? (
-                          <>
-                            <DropdownItem to="/control-panel-page" tag={Link}>
-                                <i className="now-ui-icons ui-1_settings-gear-63"></i>
-                                Control Panel
-                            </DropdownItem>
-                            {
-                              user.payments.some(status => status.name === 'Card') ? (
-                                <DropdownItem onClick={handleStripe}>
-                                My Stripe
+                loggedIn ? (
+                <>
+                    <UncontrolledDropdown nav>
+                      <DropdownToggle
+                        caret
+                        color="default"
+                        href="#pablo"
+                        nav
+                        onClick={e => e.preventDefault()}
+                      >
+                        <i className="now-ui-icons users_single-02"></i>
+                        <p>{user.last_name}</p>
+                      </DropdownToggle>
+                      <DropdownMenu>
+                        {
+                          (user.role === 'lessor') ? (
+                            (user.space_name) ? (
+                              <>
+                                <DropdownItem to="/control-panel-page" tag={Link}>
+                                    <i className="now-ui-icons ui-1_settings-gear-63"></i>
+                                    Control Panel
                                 </DropdownItem>
-                              ) : ('')
-                            }
-                            
-                          </>
-                          
-                        ):
-                          (<DropdownItem to="/setup-page" tag={Link}>
-                            <i className="now-ui-icons ui-1_settings-gear-63"></i>
-                            Setup
-                          </DropdownItem>) ): (
-                            <DropdownItem
-                              to="/mybookings" tag={Link}
-                            >
-                              <i className="now-ui-icons education_agenda-bookmark"></i>
-                              My Bookings 
-                            </DropdownItem>
-                          )
-                    }
-                    
-                    
-                    <DropdownItem
-                      onClick={logout}
-                      target="_blank"
-                    >
-                      <i className="now-ui-icons media-1_button-power"></i>
-                      Logout
-                    </DropdownItem>
-                  </DropdownMenu>
-                </UncontrolledDropdown>
+                                {
+                                  user.payments.some(status => status.name === 'Card') ? (
+                                    <DropdownItem onClick={handleStripe}>
+                                    My Stripe
+                                    </DropdownItem>
+                                  ) : ('')
+                                }
+                                
+                              </>
+                              
+                            ):
+                              (<DropdownItem to="/setup-page" tag={Link}>
+                                <i className="now-ui-icons ui-1_settings-gear-63"></i>
+                                Setup
+                              </DropdownItem>) ): (
+                                <DropdownItem
+                                  to="/mybookings" tag={Link}
+                                >
+                                  <i className="now-ui-icons education_agenda-bookmark"></i>
+                                  My Bookings 
+                                </DropdownItem>
+                              )
+                        }
+                        
+                        
+                        <DropdownItem
+                          onClick={logout}
+                          target="_blank"
+                        >
+                          <i className="now-ui-icons media-1_button-power"></i>
+                          Logout
+                        </DropdownItem>
+                      </DropdownMenu>
+                    </UncontrolledDropdown>
+                    </>
                   ) : (
                   <Fragment>
                     <NavItem>

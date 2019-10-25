@@ -30,7 +30,7 @@ import ControlPanelPage from "views/examples/ControlPanelPage";
 import FinalSetupPage from "views/examples/FinalSetupPage";
 import TimeLineViewPage from "views/examples/TimeLineViewPage";
 let token = cookie.get('token')
-const jwt_secret = 'kJmj3ixbt8go4WAcLETzwAVdrHa2lERuS2CI7G7kQI3I5bAM187n0vkINC06jq99'
+const jwt_secret = 'N3uJKf77wT8V62DufhaPu666dDm624qZzUGHOV2TK4kgLcFSarPna7j0I2YVEEFG'
 window.Pusher = require('pusher-js');
 if(token) {
   jwt.verify(token, jwt_secret, (err, decoded)=> {
@@ -134,19 +134,22 @@ if(token)
       render()
     })
     
-    window.Echo = new Echo({
-        broadcaster: 'pusher',
-        key: 'anyKey',
-        wsHost: window.location.hostname,
-        wsPort: 6001,
-        disableStats: true,
-      //   authEndpoint : 'http://127.0.0.1:8000/broadcasting/auth',
-      //   auth: {
-      //     headers: {
-      //         Authorization: 'Bearer ' + token,
-      //     }
-      // },
-    });
+        // window.Echo = new Echo({
+        // broadcaster: 'pusher',
+        // key: 'anyKey',
+        // wsHost: window.location.hostname,
+        // wsPort: 6001,
+        // disableStats: true,
+        // authEndpoint: `http://127.0.0.1:8000/broadcasting/auth`, 
+        // auth: {
+        //   headers: {
+        //     Authorization: `Bearer ${token}`,
+        //     Accept: 'application/json',
+        //   },
+        // },
+        // });
+
+      
     }
 else {
   render()

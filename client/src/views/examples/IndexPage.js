@@ -34,7 +34,7 @@ function IndexPage() {
         <div
           className="page-header-image"
           style={{
-            backgroundImage: "url(" + require("assets/img/login.jpg") + ")"
+            backgroundImage: "url(" + require("assets/img/3.jpg") + ")"
           }}
         ></div>
         <div className="content">

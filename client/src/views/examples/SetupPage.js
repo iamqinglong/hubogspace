@@ -28,6 +28,7 @@ import axios from "axios";
 import cookie from 'js-cookie'
 
 function SetupPage(props) {
+  
   const user = useSelector(state=>state.auth.user)
   const [buttonDisabled, setButtonDisabled] = useState(false);
   const [nameFocus, setNameFocus] = useState(false);

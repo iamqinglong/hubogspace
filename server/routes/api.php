@@ -54,7 +54,8 @@ Route::group(['middleware' => 'api'], function() {
     Route::post('checkIn/{booking}', 'BookingController@checkIn');
     Route::post('checkOut/{booking}', 'BookingController@checkOut');
     Route::post('bookerCancelBooking/{booking}', 'BookingController@bookerCancelBooking');
-    
+    Route::post('lessorCancelBooking/{booking}', 'BookingController@lessorCancelBooking');
+
     Route::post('reviewAndRate/{booking}', 'ReviewController@reviewAndRate');
 });
 

@@ -89,7 +89,7 @@ const SignUpPage =(props)=> {
         <div
           className="page-header-image"
           style={{
-            backgroundImage: "url(" + require("assets/img/login.jpg") + ")"
+            backgroundImage: "url(" + require("assets/img/3.jpg") + ")"
           }}
         ></div>
         <div className="content">
@@ -98,12 +98,8 @@ const SignUpPage =(props)=> {
               <Card className="card-login card-plain">
                 <Form action="" className="form" method="" onSubmit={submit}>
                   <CardHeader className="text-center">
-                    <div className="logo-container">
-                      <img
-                        alt="..."
-                        src={require("assets/img/now-logo.png")}
-                      ></img>
-                    </div>
+            
+                    <h1>Sign Up</h1>
                   </CardHeader>
                   <CardBody>
                     <InputGroup
