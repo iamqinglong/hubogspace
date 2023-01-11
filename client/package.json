@@ -11,7 +11,7 @@
     "deck.gl": "^7.3.3",
     "font-awesome": "^4.7.0",
     "js-cookie": "^2.2.1",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "laravel-echo": "^1.6.1",
     "mapbox-gl": "^1.4.1",
     "moment": "^2.24.0",
